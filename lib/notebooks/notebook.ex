@@ -137,8 +137,6 @@ defmodule Utils.Notebooks.Notebook do
   end
 
   def save_release(notebook) do
-    IO.inspect(notebook)
-
     Path.join([
       notebook.release_dir,
       notebook.relative_path

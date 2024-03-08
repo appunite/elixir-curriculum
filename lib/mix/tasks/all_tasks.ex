@@ -27,7 +27,7 @@ defmodule Mix.Tasks.AllTasks do
     root_notebook
     |> Tasks.add_notebook_boilerplate()
     |> Tasks.update_deps()
-    |> Tasks.update_readme_outline()
+    # |> Tasks.update_readme_outline()
     |> Tasks.set_release_links()
     |> Tasks.save_release()
 
