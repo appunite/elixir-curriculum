@@ -13,10 +13,10 @@ Mix.install([
 
 Upon completing this lesson, a student should be able to answer the following questions.
 
-* What is mix umbrella application and how to create it?
-* How does mix manage umbrella dependencies?
-* How to configure apps?
-* How to cover simple module with unit-tests?
+- What is mix umbrella application and how to create it?
+- How does mix manage umbrella dependencies?
+- How to configure apps?
+- How to cover simple module with unit-tests?
 
 ## Umbrella apps
 
@@ -166,10 +166,10 @@ It's your turn, make it happen in your `pokemon_umbrella` project.
 Now we are going to implement its first feature, returning a random pack of pokemons.
 Specification outline for `Pokedex.random_pack/1`:
 
-* it returns list of structs `%Pokedex.Pokemon{name: "name"}`
-* it accepts 1 argument size, which is has default value of five
-* it returns unique pokemons (no duplicates)
-* it uses PokemonProfile.Name.random/0 to generate names
+- it returns list of structs `%Pokedex.Pokemon{name: "name"}`
+- it accepts 1 argument size, which is has default value of five
+- it returns unique pokemons (no duplicates)
+- it uses PokemonProfile.Name.random/0 to generate names
 
 You can start as follows:
 
@@ -199,15 +199,34 @@ end
 
 Now everything is in your hands! Try to implement it.
 
+### Bigger picture how our architecture looks like
+
+```mermaid
+flowchart LR
+    subgraph Umbrella
+      :pokedex-->:pokemon_profile
+
+    end
+
+    subgraph config
+      :pokemon_profile--> config.exs
+      :pokedex--> config.exs
+    end
+
+    subgraph deps
+      :pokemon_profile-->:faker
+    end
+```
+
 ### Real use cases
 
 Umbrella apps can be used for the following use cases:
 
-* Multiple teams working on modular monolith application.
-* Logical modularization for bigger apps
-* Separating frontend from backend
-* Flexible deployments scenarios
-* Phoenix app: web + domain
+- Multiple teams working on modular monolith application.
+- Logical modularization for bigger apps
+- Separating frontend from backend
+- Flexible deployments scenarios
+- Phoenix app: web + domain
 
 In the repository that implements precard service v2, we also employed umbrella project pattern. It looks like this:
 
@@ -258,8 +277,8 @@ mindmap
 
 For more on [Mix](https://hexdocs.pm/mix/Mix.html), consider reading the following.
 
-* [elixir-lang: Intro to Mix](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html)
-* [HexDocs: Mix](https://hexdocs.pm/mix/Mix.html#content)
+- [elixir-lang: Intro to Mix](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html)
+- [HexDocs: Mix](https://hexdocs.pm/mix/Mix.html#content)
 
 ## Commit Your Progress
 
