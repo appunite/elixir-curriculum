@@ -13,12 +13,12 @@ Mix.install([
 
 Upon completing this lesson, a student should be able to answer the following questions.
 
-- What is the purpose of Mix?
-- Where should our application go inside of a mix project?
-- How do we compile a mix project and explore it using the IEx shell?
-- How do we run tests?
-- How do we add and manage dependencies in mix project?
-- What is Elixir formatter and how to use it?
+* What is the purpose of Mix?
+* Where should our application go inside of a mix project?
+* How do we compile a mix project and explore it using the IEx shell?
+* How do we run tests?
+* How do we add and manage dependencies in mix project?
+* What is Elixir formatter and how to use it?
 
 ## Mix
 
@@ -394,8 +394,8 @@ The locally installed dependency may not exactly match the version requirement, 
 
 The `~>` symbol you see in dependencies means it will never go above its upper bound.
 
-- `~> 2.1` would allow any version below `3.0.0` and above or equal to `2.1.0`.
-- `~> 2.1.2` would allow any version below `2.2.0` and above or equal to `2.1.2`.
+* `~> 2.1` would allow any version below `3.0.0` and above or equal to `2.1.0`.
+* `~> 2.1.2` would allow any version below `2.2.0` and above or equal to `2.1.2`.
 
 The [Version documentation](https://hexdocs.pm/elixir/Version.html) goes into further depth.
 
@@ -428,10 +428,10 @@ Most projects include a README.md file which contains basic information about th
 
 There is no universal README structure however it's common to include:
 
-- The repository name.
-- The project purpose.
-- Setup instructions.
-- Collaborators on the project.
+* The repository name.
+* The project purpose.
+* Setup instructions.
+* Collaborators on the project.
 
 GitHub pages display the README on the front of the repository page for the project.
 
@@ -464,8 +464,8 @@ environment to ensure that developers don't accidentally send out text messages 
 
 For more on [Mix](https://hexdocs.pm/mix/Mix.html), consider reading the following.
 
-- [elixir-lang: Intro to Mix](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html)
-- [HexDocs: Mix](https://hexdocs.pm/mix/Mix.html#content)
+* [elixir-lang: Intro to Mix](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html)
+* [HexDocs: Mix](https://hexdocs.pm/mix/Mix.html#content)
 
 ## Commit Your Progress
 

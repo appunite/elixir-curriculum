@@ -45,7 +45,7 @@ Let's create an umbrella project for our pokemons. Use `projects` directory for 
 
 You should notice that the command generated several files.
 
-```
+```bash
 $ cd projects
 $ mix new pokemon_umbrella --umbrella
 * creating README.md
@@ -71,7 +71,7 @@ for each application in the apps/ directory.
 
 Your project should have the following file and folder structure.
 
-```
+```bash
 pokemon_umbrella/
   ├── README.md
   ├── apps
@@ -216,6 +216,11 @@ flowchart LR
     subgraph deps
       :pokemon_profile-->:faker
     end
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> ed29706b (cleared outline)
 ```
 
 ### Real use cases
