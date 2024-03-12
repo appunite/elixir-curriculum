@@ -1,16 +1,25 @@
 # Day 2
 
-## Overview
-
 At Day 1 you have learned fundamentals of Elixir and functional programming. We hope that was a fun!
 Today our schedule is
 Use the following index to find reading material and exercises for this course.
-
-<!-- livebook:{"branch_parent_index":0} -->
 
 ## Mix introduction
 
 - [Setting up Mix project](./presentation/mix_introduction.livemd)
 - [Mix deeper dive](./presentation/mix_deeper_dive.livemd)
 
-## Phoenix introduction
+## Phoenix part
+
+- [Phoenix overview](./presentation/phoenix_overview.livemd)
+- [Ecto in action](./presentation/ecto_in_action.livemd)
+- [Exposing HTTP API](./presentation/phoenix_http_api.livemd)
+- [Integrating third-party HTTP API with Tesla](./presentation/integrating_third_party_http_api_with_tesla.livemd)
+
+## Extras
+
+- Simple UI with LiveView and generators
+- Oban introduction and async work
+- Reactive UI with LV and PubSub
+- Advanced domain models - implementing a reservation system
+- Metaprogramming with Elixir (macro, AST)

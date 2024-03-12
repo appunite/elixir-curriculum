@@ -14,7 +14,7 @@ demos/*/priv/static/cache_manifest.json
 demos/*/npm-debug.log
 demos/*/assets/node_modules/
 release
-
+example_projects/app_umbrella
 /.nix_hex/
 /.nix_mix/
 

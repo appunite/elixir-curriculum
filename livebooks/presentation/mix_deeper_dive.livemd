@@ -216,11 +216,6 @@ flowchart LR
     subgraph deps
       :pokemon_profile-->:faker
     end
-<<<<<<< HEAD
-=======
-
-
->>>>>>> ed29706b (cleared outline)
 ```
 
 ### Real use cases

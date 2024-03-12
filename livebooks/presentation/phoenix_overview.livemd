@@ -1,4 +1,4 @@
-# Phoenix 1.7
+# Phoenix overview
 
 ```elixir
 Mix.install([
@@ -32,27 +32,16 @@ Mix.install([
 
 ## Review Questions
 
-* What are body params, url params, and query params in an HTTP request?
-* What is the conn?
-* What are the layers of a Phoenix application?
+- What are the differences between Mix project and Phoenix project?
+- What's the recommended way of structuring Phoenix project?
+- How Phoenix approaches MVC?
+- What are the layers of a Phoenix application?
+- Where is the “model” from MVC in Phoenix?
+- What is the context and how it is structured?
+- How to create a new Phoenix application with **mix phx.new**?
+- What's included into Phoenix?
 
 ## Overview
-
-### Phoenix 1.7
-
-Phoenix 1.7 introduced several significant changes compared with Phoenix 1.6. See the [Release Announcement](https://phoenixframework.org/blog/phoenix-1.7-final-released) for a full overview of changes made. One of the most significant changes was [Replacing Phoenix.View with Phoenix.Component](https://hexdocs.pm/phoenix_view/2.0.0/Phoenix.View.html#module-replaced-by-phoenix-component). In addition, Phoenix now comes with Tailwind out of the box.
-
-Phoenix 1.7 also introduced [Verified Routes](https://hexdocs.pm/phoenix/1.7.0-rc.0/Phoenix.VerifiedRoutes.html) using the `~p` sigil. These routes replace [Path Helpers](https://hexdocs.pm/phoenix/routing.html#path-helpers).
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-~p"/home"
-```
-
-Many projects in the Elixir ecosystem will still use Phoenix 1.6 or older. While this course focuses on Phoenix 1.7, consider reading the previous [Phoenix 1.6](./deprecated_phoenix_1.6.livemd) section to learn more about the older version.
-
-<!-- livebook:{"break_markdown":true} -->
 
 ### Phoenix
 
@@ -68,13 +57,52 @@ YouTube.new("https://www.youtube.com/watch?v=MZvmYaFkNJI")
 
 The video above uses [Phoenix LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html) to create interactive and real-time features. We will cover LiveView in a future lesson.
 
+Generating new Phoenix application is as simple as:
+
+```bash
+mix phx.new my_app
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### What's included after `mix phx.new`?
+
+- database toolkit (migrations, schema mapping, querying and much more) via [Ecto](https://hexdocs.pm/ecto)
+- authentication system - [**mix phx.gen.auth**](https://hexdocs.pm/phoenix/mix_phx_gen_auth.html)
+- email sending engine [Swosh](https://hexdocs.pm/swoosh/Swoosh.html)
+- testing framework **ExUnit**
+- web-framework building blocks
+  - HTTP server - leveraging Erlang scalability
+  - websockets support
+  - routing, controllers, plugs (middleware)
+- tools for creating real-time, rich interaction web-apps with [Phoenix LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html)
+  - modern component engine (defining attrs, slots, handling actions)
+  - [JS interoperability](https://hexdocs.pm/phoenix_live_view/js-interop.html)
+  - TailwindCSS
+- App localization - [Gettext](https://hexdocs.pm/gettext)
+- LiveDashboard for inspecting deployments [LiveDashboard](https://hexdocs.pm/phoenix_live_dashboard/Phoenix.LiveDashboard.html)
+  - ![a](https://github.com/phoenixframework/phoenix_live_dashboard/raw/main/screenshot.png)
+- realease and configuration management - Elixir releases are standalone binaries
+- hot code swapping - we can recompile code on the production (useful in certain cases)
+- local and production REPL - IEx
+
+### How it can be extended further with great libraries:
+
+- exposing GraphQL API - [Absinthe](https://hexdocs.pm/absinthe)
+- HTTP clients - [Tesla](https://hexdocs.pm/tesla)
+- supporting mocking in tests [Mox](https://hexdocs.pm/mox) (library written by Jose Valim)
+- async jobs - [Oban](https://hexdocs.pm/oban)
+- feature flags - [FunWithFlags](https://hexdocs.pm/fun_with_flags)
+
+...and much more to be found https://github.com/h4cc/awesome-elixir
+
 ## Model View Controller (MVC) Architecture
 
 Phoenix is heavily influenced by MVC architecture, where an application is broken into several layers using [Model-View-Controller (MVC)](https://en.wikipedia.org/wiki/Model–view–controller) architecture.
 
-* **Model**: Manages the data and business logic of the application.
-* **View**: Represents visual information.
-* **Controller**: Handles requests and manipulates the model/view to respond to the user.
+- **Model**: Manages the data and business logic of the application.
+- **View**: Represents visual information.
+- **Controller**: Handles requests and manipulates the model/view to respond to the user.
 
 More recently, Phoenix has been breaking away from strict MVC architecture, but understanding this style of architecture will help us better understand the overall design choices behind Phoenix.
 
@@ -86,111 +114,118 @@ More recently, Phoenix has been breaking away from strict MVC architecture, but 
 
 <!-- livebook:{"branch_parent_index":2} -->
 
-## Plug
-
-Under the hood, Phoenix uses the [Plug](https://hexdocs.pm/plug/readme.html) specification for composing a web application with functions. Plugs are functions that transform a `conn` (connection) data structure.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-flowchart LR
-subgraph Input
-  CP[conn, params]
-end
-subgraph Output
-  C[conn]
-end
-Output[conn]
-P[Plug Function]
-Input --> P --> Output
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Phoenix sets up a pipeline of plugs and uses the transformed `conn` [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) struct to return a response to the client.
-
-Plug uses [Cowboy](https://github.com/ninenines/cowboy), a small and fast HTTP web server. Cowboy uses [Ranch](https://github.com/ninenines/ranch) to manage the underlying TCP connections for the web server.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-flowchart TB
-P[Phoenix]
-PG[Plug]
-C[Cowboy]
-R[Ranch]
-P --> PG --> C --> R
-
-click P "https://hexdocs.pm/phoenix/overview.html"
-click PG "https://hexdocs.pm/plug/readme.html"
-click C "https://github.com/ninenines/cowboy"
-click R "https://github.com/ninenines/ranch"
-```
-
-<!-- livebook:{"branch_parent_index":2} -->
-
 ## Layered Architecture
 
 Phoenix breaks the complexity of our application into several layers with different responsibilities. Separating an application into layers simplifies reasoning about and collaborating on complex applications.
 
 Phoenix generates the following layers of our architecture by default.
 
-* **Endpoint**: The boundary layer of the application.
-* **Router**: Routes the request to the correct controller.
-* **Controller**: Handles the request—generally, the controller delegates to the Model and View to manipulate business logic and return a response.
-* **Context**: a module that defines functions related to a specific part of your application, such as users or products. It helps to organize and simplify your code by separating concerns and making it easier to maintain.
-* **Schema**: A schema maps the database data into an Elixir struct.
-* **Migration**: Migrations are used to make changes to the database schema over time, such as adding, removing, or altering tables.
-* **Component (Previously the View in 1.6)**: Handles returning the response and may delegate to a template.
-* **Template**: Builds a response, typically using HEEx (HTML + Embedded Elixir) to build an HTML web page.
+- **Endpoint**: The boundary layer of the application.
+- **Router**: Routes the request to the correct controller.
+- **Controller**: Handles the request—generally, the controller delegates to the Model and View to manipulate business logic and return a response.
+- **Context**: a module that defines functions related to a specific part of your application, such as users or products. It helps to organize and simplify your code by separating concerns and making it easier to maintain.
+- **Schema**: A schema maps the database data into an Elixir struct.
+- **Migration**: Migrations are used to make changes to the database schema over time, such as adding, removing, or altering tables.
+- **Component**: Handles returning the response and may delegate to a template.
+- **Template**: Builds a response, typically using HEEx (HTML + Embedded Elixir) to build an HTML web page.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ![](images/Phoenix%201.7%20Architecture%20Diagram.png)
 
-<!-- livebook:{"branch_parent_index":2} -->
-
 ## Project Structure
 
-By default, Phoenix 1.7 contains the following project folder structure where `app` is the name of your application.
+Phoenix allows to organize project structure in two ways:
+
+- single Mix app
+- as an umbrella project
+
+It is controlled by `--umbrella` argument passed to `mix phx.new`. Our recommendation based on previous experience is going for umbrella projects. Further exercises will assume operating under the umbrella.
+
+So what can we expect after running `mix phx.new app --umbrella`? We should have following directory structure:
 
 ```
+
+├── README.md
 ├── _build
-├── assets
-├── config
-├── deps
-├── lib
-│   ├── app
-│   ├── app.ex
-│   ├── app_web
-│   └── app_web.ex
-├── priv
-├── test
-├── formatter.exs
+├── .formatter.exs
 ├── .gitignore
+├── apps
+│   ├── app
+│   │   ├── README.md
+│   |   ├── .formatter.exs
+│   |   ├── .gitignore
+│   │   ├── lib
+│   │   │   ├── app
+│   │   │   └── app.ex
+│   │   ├── mix.exs
+│   │   ├── priv
+│   │   │   └── repo
+│   │   └── test
+│   │       ├── support
+│   │       └── test_helper.exs
+│   └── app_web
+│       ├── README.md
+│       ├── .formatter.exs
+│       ├── .gitignore
+│       ├── assets
+│       │   ├── css
+│       │   ├── js
+│       │   ├── tailwind.config.js
+│       │   └── vendor
+│       ├── lib
+│       │   ├── app_web
+│       │   └── app_web.ex
+│       ├── mix.exs
+│       ├── priv
+│       │   ├── gettext
+│       │   └── static
+│       └── test
+│           ├── app_web
+│           ├── support
+│           └── test_helper.exs
+├── config
+│   ├── config.exs
+│   ├── dev.exs
+│   ├── prod.exs
+│   ├── runtime.exs
+│   └── test.exs
 ├── mix.exs
-├── mix.lock
-└── README.md
+└── mix.lock
 ```
 
 Phoenix projects use [Mix](./mix.livemd) so this folder structure should feel somewhat familiar. Here's a breakdown of each file/folder.
 
-* **_build**: Build artifacts, such as compiled .beam code.
-* **assets**: Static assets, such as JavaScript and CSS.
-* **config**: Configuration files for the application, such as the database configuration and environment-specific settings.
-* **deps**: Compiled project dependencies, which Mix manages.
-* **lib**: The application's source code.
-  * **app**: The business logic for the application, organized into contexts.
-  * **app.ex**: The main application module, which starts the web server and configures the application.
-  * **app_web**: The web-specific code for the application, such as controllers, components, and templates.
-  * **app_web.ex**: The main web module, which configures the Phoenix application.
-* **priv**: The "priv" directory in Phoenix contains resources needed for production that are not part of the source code, including static files such as images and fonts and generated assets from the "assets" directory.
-* **test**: Tests for the application.
-* **formatter.exs**: Formatter configuration.
-* **.gitignore**: Configuration for files that should be ignored in .git.
-* **mix.exs**:  Configures the application's dependencies and other settings for the Mix project.
-* **mix.lock**: The exact versions of the dependencies used in the application, generated by Mix.
-* **README.md**: Contains information about the project, such as installation instructions or documentation.
+### What's shared between apps:
+
+- **\_build**: Build artifacts, such as compiled .beam code.
+- **config**: Configuration files for the application, such as the database configuration and environment-specific settings.
+- **deps**: Compiled project dependencies, which Mix manages.
+- **README.md**: Contains information about the project, such as installation instructions or documentation.
+- **mix.lock**: The exact versions of the dependencies used in the application, generated by Mix.
+- **mix.exs**: Configures the umbrella project's dependencies and other settings.
+- **formatter.exs**: Formatter configuration.
+- **.gitignore**: Configuration for files that should be ignored in .git.
+
+### In `apps/app_web` we have code for web application:
+
+- **assets**: Static assets, such as JavaScript and CSS.
+- **lib**: The application's source code.
+  - **app_web**: The web-specific code for the application, such as controllers, components, and templates.
+  - **app_web.ex**: The main web module, which configures the Phoenix application.
+- **priv**: The "priv" directory in Phoenix contains resources needed for production that are not part of the source code, including static files such as images and fonts and generated assets from the "assets" directory.
+- **test**: Tests for the application.
+- **formatter.exs**: Formatter configuration.
+- **.gitignore**: Configuration for files that should be ignored in .git.
+
+### In `apps/app` we have place for our domain code:
+
+- **lib**: The application's source code.
+  - **app**: The business logic for the application, organized into contexts.
+  - **app.ex**: The main application module, which starts the web server and configures the application.
+- **test**: Tests for the application.
+- **formatter.exs**: Formatter configuration.
+- **.gitignore**: Configuration for files that should be ignored in .git.
 
 <!-- livebook:{"branch_parent_index":2} -->
 
@@ -209,6 +244,10 @@ The Phoenix router uses the [pipeline/2](https://hexdocs.pm/phoenix/Phoenix.Rout
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+pipeline :api do
+  plug :accepts, ["json"]
+end
+
 pipeline :browser do
   plug :accepts, ["html"]
   plug :fetch_session
@@ -224,10 +263,11 @@ Then the [scope/2] macro groups related routes together under a common base URL.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-scope "/", HelloWeb do
-  pipe_through :browser
+scope "/", AppWeb do
+  pipe_through :api
 
-  get "/", PageController, :home
+  get "/posts", PostController, :index
+  get "/posts/:id", PostController, :show
 end
 ```
 
@@ -240,58 +280,43 @@ Controllers in the `app_web/controllers` manage the response to the HTTP request
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule AppWeb.PageController do
+defmodule AppWeb.PostController do
   use AppWeb, :controller
 
-  def home(conn, _params) do
-    render(conn, :home)
+  def index(conn, _params) do
+    conn
+    |> render(:index, posts: [%{id: 1, title: "Post 1"}, %{id: 2, title: "Post 2"}])
+  end
+
+  def show(conn, %{"id" => id}) do
+    conn
+    |> render(:show, post: %{id: id, title: "Post #{id}"})
   end
 end
 ```
 
-The controller delegates to a [function component](https://hexdocs.pm/phoenix/components.html) in a corresponding `*HTML` component module to return a HEEx template. The atom `:home` above corresponds to the function `home/1` called in the component module.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Component
-
-The `*HTML` component returns a HEEx template using sigil `~H`.
-
-<!-- livebook:{"force_markdown":true} -->
+The controller delegates to a [JSON view](https://hexdocs.pm/phoenix/json_and_apis.html#rendering-json) in a corresponding `*JSON` module to return a JSON. The atom `:index` above corresponds to the function `index/1` called in the component module.
 
 ```elixir
-defmodule AppWeb.PageHTML do
-  use AppWeb, :html
+defmodule AppWeb.PostJSON do
+  def index(%{posts: posts}) do
+    %{data: for(post <- posts, do: data(post))}
+  end
 
-  def home(assigns) do
-    ~H"""
-    Hello World
-    """
+  def show(%{post: post}) do
+    %{data: data(post)}
+  end
+
+  defp data(%{} = post) do
+    %{
+      id: post.id,
+      title: post.title
+    }
   end
 end
 ```
 
-Or embeds template files contained in a folder using the [embed_templates/2](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#embed_templates/2) macro from [Phoenix.Component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#content).
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-defmodule AppWeb.PageHTML do
-  use AppWeb, :html
-
-  embed_templates "page_html/*"
-end
-```
-
 <!-- livebook:{"break_markdown":true} -->
-
-### Templates
-
-The template contains the HEEx code used to build an HTML response. For example, the following might be contained in `app_web/page_html/home.html.heex`.
-
-```html
-<p>Hello, World!</p>
-```
 
 ## Conn
 
@@ -492,9 +517,9 @@ Then the `params` in the controller would be bound to:
 
 For more on Phoenix, consider the following resources.
 
-* [Phoenix HexDocs](https://hexdocs.pm/phoenix/Phoenix.html)
-* [Plug HexDocs](https://hexdocs.pm/plug/readme.html)
-* [Phoenix a Web Framework for the New Web • José Valim • GOTO 2016](https://www.youtube.com/watch?v=bk3icU8iIto&ab_channel=GOTOConferences)
+- [Phoenix HexDocs](https://hexdocs.pm/phoenix/Phoenix.html)
+- [Plug HexDocs](https://hexdocs.pm/plug/readme.html)
+- [Phoenix a Web Framework for the New Web • José Valim • GOTO 2016](https://www.youtube.com/watch?v=bk3icU8iIto&ab_channel=GOTOConferences)
 
 ## Commit Your Progress
 
