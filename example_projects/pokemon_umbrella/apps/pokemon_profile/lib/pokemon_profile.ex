@@ -3,6 +3,9 @@ defmodule PokemonProfile do
   Documentation for `PokemonProfile`.
   """
 
+  alias PokemonProfile.Greeter
+  alias PokemonProfile.Name
+
   @doc """
   Hello world.
 
@@ -17,6 +20,7 @@ defmodule PokemonProfile do
   end
 
   def greet do
-    PokemonProfile.Greeter.hello(PokemonProfile.Name.random())
+    Name.random()
+    |> Greeter.hello()
   end
 end

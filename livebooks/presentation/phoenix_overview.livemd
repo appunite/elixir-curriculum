@@ -247,15 +247,6 @@ The Phoenix router uses the [pipeline/2](https://hexdocs.pm/phoenix/Phoenix.Rout
 pipeline :api do
   plug :accepts, ["json"]
 end
-
-pipeline :browser do
-  plug :accepts, ["html"]
-  plug :fetch_session
-  plug :fetch_live_flash
-  plug :put_root_layout, {AppWeb.LayoutView, :root}
-  plug :protect_from_forgery
-  plug :put_secure_browser_headers
-end
 ```
 
 Then the [scope/2] macro groups related routes together under a common base URL. Inside of the scope, the [get/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#get/4), [post/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#post/4), [put/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#put/4), [patch/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#patch/4), and [delete/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#delete/4) macros can handle a specific HTTP request and delegate to a controller to return a response.
@@ -268,14 +259,13 @@ scope "/", AppWeb do
 
   get "/posts", PostController, :index
   get "/posts/:id", PostController, :show
+  post "/posts", PostController, :create
 end
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
 ### Controller
 
-Controllers in the `app_web/controllers` manage the response to the HTTP request.
+Controllers in the `apps/app_web/lib/app_web/controllers` manage the response to the HTTP request.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -295,193 +285,13 @@ defmodule AppWeb.PostController do
 end
 ```
 
-The controller delegates to a [JSON view](https://hexdocs.pm/phoenix/json_and_apis.html#rendering-json) in a corresponding `*JSON` module to return a JSON. The atom `:index` above corresponds to the function `index/1` called in the component module.
-
-```elixir
-defmodule AppWeb.PostJSON do
-  def index(%{posts: posts}) do
-    %{data: for(post <- posts, do: data(post))}
-  end
-
-  def show(%{post: post}) do
-    %{data: data(post)}
-  end
-
-  defp data(%{} = post) do
-    %{
-      id: post.id,
-      title: post.title
-    }
-  end
-end
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-## Conn
-
-In a Phoenix app, "conn" stands for "connection". It represents the connection between the client and the web server, and contains information about the HTTP request and response.
-
-The conn struct is a central concept in Phoenix and is used extensively throughout the framework. It is created when a client sends a request to the server and is passed around between the various parts of the application as the request is processed.
-
-The conn struct contains information such as the HTTP method, the request path, request headers, request body, and response headers. It also includes information about the client's session and any authentication information, among other things.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Assigns
-
-The [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) stores an `assigns` map that is injected into the HEEx template. Values in the `assigns` map can be bound by providing a keyword list as the third argument of the [Controller.render/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#render/3) function.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-defmodule AppWeb.PageController do
-  use AppWeb, :controller
-
-  def home(conn, _params) do
-    render(conn, :home, message: "Hello, World!", injected_class: "text-2xl")
-  end
-end
-```
-
-We can use `<%= %>` syntax to embed Elixir and use the `assigns` provided in the template file. Alternatively, we can use curly brackets `{}` to embed elixir in an HTML attribute.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<p class={"bg-black text-white #{assigns.injected_class}"}><%= assigns.message %></p>
-```
-
-`@` is a shorthand for `assigns.`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<p class={"bg-black text-white #{@injected_class}"}><%= @message %></p>
-```
-
-<!-- livebook:{"branch_parent_index":2} -->
-
-## Layouts
-
-The `:put_root_layout` plug in the `:browser` pipeline in `router.ex` sets up layout HEEx templates that are rendered on every page.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-pipeline :browser do
-  plug :accepts, ["html"]
-  plug :fetch_session
-  plug :fetch_live_flash
-  plug :put_root_layout, {AppWeb.LayoutView, :root} # sets up root layout
-  plug :protect_from_forgery
-  plug :put_secure_browser_headers
-end
-```
-
-The root layout in `components/layouts/root.html.heex` is a template used by LiveView and regular views that contains the basic structure of an HTML document and any global styles or scripts. It ensures consistency across all pages of your application.
-
-The app layout in `components/layouts/app.html.heex` is the standard layout for regular HTTP requests and LiveViews.
-
-See [LiveLayouts](https://hexdocs.pm/phoenix_live_view/live-layouts.html) for more information on layouts and their use.
-
-<!-- livebook:{"branch_parent_index":2} -->
-
-## Phoenix Components
-
-Phoenix 1.7 allows us to use function components in both LiveViews and Controller views.
-
-Phoenix generates some useful function components in the `app_web/components/core_components.ex` file and the [Phoenix.Component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#components) module defines components such as [link/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#link/1) and [form/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#form/1).
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<.link navigate={~p"/"}>Home</.link>
-```
-
-We can create our own function components. A function component takes the `assigns` parameter, and returns a HEEx template. We can optionally define attributes with the [attr](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#attr/3) macro.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-attr :name, :string
-
-def hello(assigns) do
-  ~H"""
-  <p><%= @name %></p>
-  """
-end
-```
-
-<!-- livebook:{"branch_parent_index":2} -->
-
-## Embedded Elixir
-
-We can embed Elixir in our template files using the following syntax.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<%= expression %>
-```
-
-Where `expression` is our Elixir code, for example:
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<%= 1 + 1 %>
-```
-
-We can write any Elixir expression. So, for example, we could write an `if` statement to render different HTML depending on some condition.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<%= if DateTime.utc_now().hour > 12 do %>
-  <p>Good afternoon!</p>
-<% else %>
-  <p>Good morning!</p>
-<% end %>
-```
-
-Or a loop using the `for` comprehension. Often we use this to create multiple elements based on a collection.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<%= for int <- 1..10 do %>
-  <p><%= int %></p>
-<% end %>
-```
-
-Notice that all expressions that output a value use the `=` symbol. Expressions that don't output a value (or continue the current expression) omit the `=` symbol.
-
-Here's a quick tip, we can`IO.inspect/2` values in the page without injecting them into the HTML.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<% IO.inspect(@value) %>
-```
-
-Or, to view them in the HTML as a string, you can use `Kernel.inspect/2`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<%= inspect(@value) %>
-```
-
-<!-- livebook:{"branch_parent_index":2} -->
-
-## Controller Params
+### Controller Params
 
 Controllers actions accept `params` as the second argument. `params` is a combined map of comma-separated query params, the [body](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) of the request, and dynamic values in the URL.
 
 For example, if we sent a post request to the following URL:
 
-http://localhost:4000/1/?param1=some_value,param2=some_value
+http://localhost:4000/api/posts/1/?param1=some_value,param2=some_value
 
 With the following data in the POST body:
 
@@ -512,6 +322,43 @@ Then the `params` in the controller would be bound to:
   "param2" => "some_value"
 }
 ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+The controller delegates to a [JSON view](https://hexdocs.pm/phoenix/json_and_apis.html#rendering-json) in a corresponding `*JSON` module to return a JSON. The atom `:index` above corresponds to the function `index/1` called in the component module.
+
+```elixir
+defmodule AppWeb.PostJSON do
+  def index(%{posts: posts}) do
+    %{data: for(post <- posts, do: data(post))}
+  end
+
+  def show(%{post: post}) do
+    %{data: data(post)}
+  end
+
+  defp data(%{} = post) do
+    %{
+      id: post.id,
+      title: post.title
+    }
+  end
+end
+```
+
+## Conn
+
+In a Phoenix app, "conn" stands for "connection". It represents the connection between the client and the web server, and contains information about the HTTP request and response.
+
+The conn struct is a central concept in Phoenix and is used extensively throughout the framework. It is created when a client sends a request to the server and is passed around between the various parts of the application as the request is processed.
+
+The conn struct contains information such as the HTTP method, the request path, request headers, request body, and response headers. It also includes information about the client's session and any authentication information, among other things.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Assigns
+
+The [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) stores an `assigns` map that is injected into the HEEx template. Values in the `assigns` map can be bound by providing a keyword list as the third argument of the [Controller.render/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#render/3) function.
 
 ## Further Reading
 

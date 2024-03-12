@@ -9,6 +9,27 @@ Mix.install([
 ])
 ```
 
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Phoenix 1.7">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/sql_drills.livemd">SQL Drills</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/web_servers.livemd">Web Servers</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
 ## Review Questions
 
 Upon completing this lesson, a student should be able to answer the following questions.
@@ -21,13 +42,13 @@ Upon completing this lesson, a student should be able to answer the following qu
 ## Umbrella apps
 
 Umbrella apps is a pattern for managing internal dependencies, Mix supports two methods to work with them: Git repositories or umbrella projects.
-Using Git repositories for internal dependencies is somewhat discouraged in Elixir. Remember that the runtime and the Elixir ecosystem already provide the concept of applications. As such, we expect you to frequently break your code into applications that can be organized logically, even within a single project.
+Using Git repositories for internal dependencies is somewhat discouraged in Elixir.
+
+Remember that the runtime and the Elixir ecosystem already provide the concept of applications. As such, we expect you to frequently break your code into applications that can be organized logically, even within a single project.
+
 However, if you push every application as a separate project to a Git repository, your projects may become very hard to maintain as you will spend a lot of time managing those Git repositories rather than writing your code.
 
-For this reason, Mix supports "umbrella projects". Umbrella projects are used to build applications that run together in a single repository. That is exactly the style we are going to explore in the next sections.
-
-Further reading:
-[Umbrella apps](https://hexdocs.pm/elixir/dependencies-and-umbrella-projects.html#internal-dependencies)
+For this reason, Mix supports **"umbrella projects"** which are used to build applications that run together in a single repository. That is exactly the style we are going to explore in the next sections.
 
 We can create an umbrella project by running the following command:
 
@@ -37,17 +58,25 @@ mix new app_name --umbrella
 
 Where `app_name` is the name of the umbrella project.
 
+Further reading:
+[Umbrella apps](https://hexdocs.pm/elixir/dependencies-and-umbrella-projects.html#internal-dependencies)
+
 <!-- livebook:{"break_markdown":true} -->
 
-### Your Turn ♔
+### Your Turn
 
-Let's create an umbrella project for our pokemons. Use `projects` directory for that.
+Let's create an umbrella project for our pokemons. Use `projects` from previous lesson.
 
-You should notice that the command generated several files.
+Run generator:
 
 ```bash
 $ cd projects
 $ mix new pokemon_umbrella --umbrella
+```
+
+You should notice that the command generated several files:
+
+```elixir
 * creating README.md
 * creating .formatter.exs
 * creating .gitignore
@@ -82,10 +111,10 @@ pokemon_umbrella/
 
 ### Adding first app
 
-We previously created just a scaffold for holding our apps. Now, we'll add first one.
-Let's reuse the application which we have created in a previous step. It should land in `pokemon_umbrella/apps` folder.
+We have just created a scaffold for holding our apps. Now, we'll add first one.
+Let's reuse the application from the previous lesson. It should land in `pokemon_umbrella/apps` folder.
 
-Let's do it:
+Let's copy it:
 
 ```bash
 cd projects
@@ -98,6 +127,11 @@ Then we need to fetch dependencies and verify if everything works:
 ```bash
 cd pokemon_umbrella
 mix deps.get
+```
+
+It will produce:
+
+```elixir
 Resolving Hex dependencies...
 Resolution completed in 0.009s
 New:
@@ -130,16 +164,21 @@ iex(1)> PokemonProfile.greet()
 ```
 
 Congratulations! You have just created your first umbrella project!
-For now it contains only singular app. Let's change it
+For now it contains only a single app. Let's change it.
 
 ### Building a pokedex
 
-Let's make it more serious. We can generate and greet single pokemons. Let's organize them into a pokedex.
-We will create a new app for that. It should go as follows
+We are going to make it more serious. We already can generate and greet single pokemons. Let's organize them into a pokedex.
+We will create a new app for that. It should go as follows:
 
 ```bash
 cd pokemon_umbrella/apps
 mix new pokedex
+```
+
+It will produce:
+
+```elixir
 * creating README.md
 * creating .formatter.exs
 * creating .gitignore
@@ -167,9 +206,9 @@ Now we are going to implement its first feature, returning a random pack of poke
 Specification outline for `Pokedex.random_pack/1`:
 
 - it returns list of structs `%Pokedex.Pokemon{name: "name"}`
-- it accepts 1 argument size, which is has default value of five
+- it accepts 1 argument called `size`, which has default value of `5`
 - it returns unique pokemons (no duplicates)
-- it uses PokemonProfile.Name.random/0 to generate names
+- it uses `PokemonProfile.Name.random/0` to generate names
 
 You can start as follows:
 
@@ -197,7 +236,9 @@ defp deps do
 end
 ```
 
-Now everything is in your hands! Try to implement it.
+Now we are going into the deeps. Exercise is really close to typical task during development in Elixir. Try to implement it in accordance to above specification.
+
+Let's start!
 
 ### Bigger picture how our architecture looks like
 
@@ -273,6 +314,70 @@ mindmap
 
 ## Configuration
 
+Configuration is an important aspect of umbrella projects. As we mentioned earlier, each app in the umbrella shares the same configuration.
+
+Now we will get hands on with the application configuration. Do you remember `PokemonProfile.Greeter` module from previous exercise? It was intended to greet pokemons. We also introduced `PokemonProfile.Greeter.Formal` but it wasn't attached anywhere.
+
+Let's change it. First we are going to separate abstraction from implementation with the help of behavior [Behaviour](https://hexdocs.pm/elixir/typespecs.html#behaviours).
+
+Previously, `PokemonProfile.Greeter` was implementing common greeting. Let's move it to `PokemonProfile.Greeter.Default` module, and in `PokemonProfile.Greeter` define a `@behaviour` abstraction. We will need `@callback` macro for that.
+
+It should look like that:
+
+<!-- livebook:{"break_markdown":true} -->
+
+```elixir
+# apps/pokemon_profile/lib/pokemon_profile/greeter.ex
+defmodule PokemonProfile.Greeter do
+  @callback hello(String.t()) :: String.t()
+end
+
+
+# apps/pokemon_profile/lib/pokemon_profile/greeter/default.ex
+defmodule PokemonProfile.Greeter.Default do
+  @behaviour PokemonProfile.Greeter
+
+  def hello(pokemon_name) do
+    "Hello #{pokemon_name}!"
+  end
+end
+```
+
+### Your turn
+
+Try to implement that in your own project. After that run `iex -S mix` and check if it works.
+
+```bash
+iex -S mix
+iex(1)> PokemonProfile.greet()
+** (UndefinedFunctionError) function PokemonProfile.Greeter.hello/1 is undefined or private
+    (pokemon_profile 0.1.0) PokemonProfile.Greeter.hello("Whimsicott")
+    iex:1: (file)
+```
+
+Unfortunately - it doesn't work. We have abstracted the implementation, but the module `PokemonProfile` still calls `PokemonProfile.Greeter` and now it doesn't define function like `hello/1`.
+
+We're gonna change it with the help of Elixir configuration. Let's modify `PokemonProfile.Greeter` as follows:
+
+<!-- livebook:{"break_markdown":true} -->
+
+```elixir
+# apps/pokemon_profile/lib/pokemon_profile/greeter.ex
+defmodule PokemonProfile.Greeter do
+  @callback hello(String.t()) :: String.t()
+
+  @adapter Application.compile_env!(:pokemon_profile, :adapter)
+
+  defdelegate hello(pokemon_name), to: @adapter
+end
+```
+
+And now last thing that we need to cover is configurng our app:
+
+```elixir
+
+```
+
 ## Further Reading
 
 For more on [Mix](https://hexdocs.pm/mix/Mix.html), consider reading the following.
@@ -288,9 +393,11 @@ Run `git status` to ensure there are no undesirable changes.
 Then run the following in your command line from the `curriculum` folder to commit your progress.
 
 ```
+
 $ git add .
 $ git commit -m "finish Mix reading"
 $ git push
+
 ```
 
 We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
@@ -318,3 +425,4 @@ We will accept applications for the June-August 2023 cohort soon.
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
+```
