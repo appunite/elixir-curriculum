@@ -5,7 +5,8 @@ Mix.install([
   {:jason, "~> 1.4"},
   {:kino, "~> 0.9", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:faker, "~> 0.18.0"}
 ])
 ```
 
@@ -47,13 +48,11 @@ Upon completing this lesson, a student should be able to answer the following qu
 
 We start a new Mix application by running the following in the command line.
 
-```
+```bash
 mix new app_name
 ```
 
 Where `app_name` is the name of the project.
-
-<!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
@@ -61,8 +60,8 @@ Create a `pokemon_profile` application. Use `projects` directory for that.
 If you haven't one, create it:
 
 ```bash
-$ mkdir -p projects
-$ cd projects
+mkdir -p projects
+cd projects
 ```
 
 Run mix generator:
@@ -72,6 +71,8 @@ mix new pokemon_profile
 ```
 
 You should notice that the command generated several files.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 * creating README.md
@@ -117,7 +118,7 @@ named after the project. You should have a `PokemonProfile` module in the `lib/p
 
 We use `@moduledoc` and `@doc` to document our code.
 
-<!-- livebook:{"break_markdown":true} -->
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 defmodule PokemonProfile do
@@ -145,7 +146,7 @@ end
 To execute the Elixir code for our Mix project, you can load the project into the IEx Shell
 by running the following command in the project folder.
 
-```
+```bash
 iex -S mix
 ```
 
@@ -157,13 +158,13 @@ Now, all of the `.ex` files and modules under the `lib/` folder are available in
 
 Load your project into the IEx Shell.
 
-```
+```bash
 iex -S mix
 ```
 
 Call the `hello/0` function.
 
-```
+```bash
 iex> PokemonProfile.hello()
 :world
 ```
@@ -200,10 +201,8 @@ We will dive deeper into how to test Elixir projects later on
 
 For now, know that you can execute all of your tests by running the following in the command line.
 
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-$ mix test
+```bash
+mix test
 ```
 
 ### Your Turn
@@ -234,6 +233,8 @@ So all of the modules in the `PokemonProfile` application would be grouped under
 
 For example, a new `Greeter` module would be defined under `PokemonProfile.Greeter`.
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 defmodule PokemonProfile.Greeter do
   def hello(pokemon_name) do
@@ -245,6 +246,8 @@ end
 Nested modules generally relate to each other, often sub-modules deal with a more specific application of the higher-level module.
 
 For example, a `Formal` module would be under the `Greeter` module.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 defmodule PokemonProfile.Greeter.Formal do
@@ -259,7 +262,7 @@ While not enforced, module and file structure often follow a pattern, where the 
 For example, the `PokemonProfile.Greeter.Formal` module would be in a `lib/pokemon_profile/greeter/formal.ex` file,
 and the `PokemonProfile.Greeter` will be in the `lib/pokemon_profile/greeter.ex` file.
 
-```
+```bash
 lib
 ├── pokemon_profile
 │   ├── greeter
@@ -294,6 +297,8 @@ ModuleB.run()
 
 In your `pokemon_profile` application, create a new module, `PokemonProfile.Name` in a `lib/pokemon_profile/name.ex` file, which will return a random name.
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 defmodule PokemonProfile.Name do
   def random do
@@ -305,6 +310,8 @@ end
 
 Then, call the `PokemonProfile.Name.random/0` function from the `PokemonProfile` module in `pokemon_profile.ex`.
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 defmodule PokemonProfile do
   def greet do
@@ -315,6 +322,8 @@ end
 ```
 
 Also module names can be aliased to make them easier to call:
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 defmodule PokemonProfile do
@@ -330,16 +339,10 @@ end
 
 Run your project in the [IEx](https://hexdocs.pm/iex/IEx.html) shell and ensure the `PokemonProfile.greet/0` function works as expected.
 
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-$ iex -S mix
+```bash
+iex -S mix
 iex> PokemonProfile.greet()
 "Hello, Pikachu!"
-```
-
-```elixir
-PokemonProfile.greet()
 ```
 
 ## Mix.exs
@@ -418,15 +421,11 @@ So now, running `PokemonProfile.greet/0` in [IEx](https://hexdocs.pm/iex/IEx.htm
 
 Try it:
 
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-$ iex -S mix
+```bash
+iex -S mix
 iex> PokemonProfile.greet()
 "Hello, Pikachu!"
 ```
-
-<!-- livebook:{"break_markdown":true} -->
 
 ### Versions
 
@@ -447,13 +446,13 @@ The [Version documentation](https://hexdocs.pm/elixir/Version.html) goes into fu
 
 You can automatically update project versions by running the following in your command line.
 
-```
+```bash
 mix deps.update example_dep
 ```
 
 Or with the `--all` option to update all deps.
 
-```
+```bash
 mix deps.update --all
 ```
 
@@ -461,7 +460,13 @@ mix deps.update --all
 
 The `.formatter.exs` file contains project configuration for how to format Elixir source code files automatically.
 
-You can run `mix format` from the command line in the project folder to format elixir code.
+You can run:
+
+```bash
+mix format
+```
+
+from the command line in the project folder to format elixir code.
 
 ### Your Turn
 
@@ -494,8 +499,8 @@ Run your `pokemon` project in the IEx shell and call `Mix.env()` to see that `:d
 
 <!-- livebook:{"force_markdown":true} -->
 
-```elixir
-$ iex -S mix
+```bash
+iex -S mix
 iex> Mix.env()
 :dev
 ```
@@ -520,9 +525,9 @@ Run `git status` to ensure there are no undesirable changes.
 Then run the following in your command line from the `curriculum` folder to commit your progress.
 
 ```
-$ git add .
-$ git commit -m "finish Mix reading"
-$ git push
+git add .
+git commit -m "finish Mix reading"
+git push
 ```
 
 We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.

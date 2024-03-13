@@ -61,20 +61,19 @@ Where `app_name` is the name of the umbrella project.
 Further reading:
 [Umbrella apps](https://hexdocs.pm/elixir/dependencies-and-umbrella-projects.html#internal-dependencies)
 
-<!-- livebook:{"break_markdown":true} -->
-
 ### Your Turn
 
 Let's create an umbrella project for our pokemons. Use `projects` from previous lesson.
 
-Run generator:
+Run generator, you should notice that the command generated several files:
 
 ```bash
-$ cd projects
-$ mix new pokemon_umbrella --umbrella
+cd projects
+mix new pokemon_umbrella --umbrella
 ```
 
-You should notice that the command generated several files:
+<!-- livebook:{"break_markdown":true} -->
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 * creating README.md
@@ -119,7 +118,6 @@ Let's copy it:
 ```bash
 cd projects
 cp -r pokemon_profile pokemon_umbrella/apps
-
 ```
 
 Then we need to fetch dependencies and verify if everything works:
@@ -130,6 +128,8 @@ mix deps.get
 ```
 
 It will produce:
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 Resolving Hex dependencies...
@@ -178,6 +178,8 @@ mix new pokedex
 
 It will produce:
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 * creating README.md
 * creating .formatter.exs
@@ -212,7 +214,10 @@ Specification outline for `Pokedex.random_pack/1`:
 
 You can start as follows:
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
+# apps/pokedex/lib/pokedex.ex
 defmodule Pokedex do
   def random_pack(_argument) do
     # TODO: Implementation
@@ -226,6 +231,8 @@ Two important things
 2. We should also cover unit tests for that scenario. Try to use above specification as a guide.
 
 Declaring umbrella dependencies looks like that:
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 # apps/pokedex/mix.exs
@@ -271,7 +278,7 @@ Umbrella apps can be used for the following use cases:
 
 In the repository that implements precard service v2, we also employed umbrella project pattern. It looks like this:
 
-```
+```bash
 apps
 ├── healios                  <- the new logic for coordination
 │   ├── README.md
@@ -324,7 +331,7 @@ Previously, `PokemonProfile.Greeter` was implementing common greeting. Let's mov
 
 It should look like that:
 
-<!-- livebook:{"break_markdown":true} -->
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 # apps/pokemon_profile/lib/pokemon_profile/greeter.ex
@@ -343,7 +350,7 @@ defmodule PokemonProfile.Greeter.Default do
 end
 ```
 
-### Your turn
+### Behaviour and adapter picking
 
 Try to implement that in your own project. After that run `iex -S mix` and check if it works.
 
@@ -359,24 +366,71 @@ Unfortunately - it doesn't work. We have abstracted the implementation, but the 
 
 We're gonna change it with the help of Elixir configuration. Let's modify `PokemonProfile.Greeter` as follows:
 
-<!-- livebook:{"break_markdown":true} -->
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 # apps/pokemon_profile/lib/pokemon_profile/greeter.ex
 defmodule PokemonProfile.Greeter do
   @callback hello(String.t()) :: String.t()
 
-  @adapter Application.compile_env!(:pokemon_profile, :adapter)
+  @adapter Application.compile_env(:pokemon_profile, :adapter)
 
   defdelegate hello(pokemon_name), to: @adapter
 end
 ```
 
-And now last thing that we need to cover is configurng our app:
+And now last thing that we need to cover is configuring our app. We are going to prepare file `config/config.exs` as follows:
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+#config/config.exs
+import Config
 
+config :pokemon_profile,
+  greeter_adapter: PokemonProfile.Greeter.Formal
 ```
+
+Let's check if that works:
+
+```bash
+iex -S mix
+iex(1)> PokemonProfile.greet()
+"Good morning Blastoise."
+```
+
+And after changing the configuration to,
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+#config/config.exs
+import Config
+
+config :pokemon_profile,
+  greeter_adapter: PokemonProfile.Greeter.Default
+```
+
+and restarting application, you should have:
+
+```bash
+iex -S mix
+iex(1)> PokemonProfile.greet()
+"Hello Blastoise!"
+```
+
+### Your turn
+
+Now the challenge for you:
+
+1. Write another implementation of `PokemonProfile.Greeter` -> `PokemonProfile.Greeter.Pirate`, that greets pokemons with "Ahoy pokemon_name !!!"
+2. Pick "adapter" on the fly, based on module 3 operation on the number of letters in pokemon name as follows:
+
+- "Blastoise" -> 9 letters -> mod 3 -> 0 -> `PokemonProfile.Greeter.Default`
+- "Pikachu" -> 7 letters -> mod 3 -> 1 -> `PokemonProfile.Greeter.Formal`
+- "Sewaddle" -> 8 letters -> mod 3 -> 2 -> `PokemonProfile.Greeter.Pirate`
+
+3. (more difficult) - write unit tests for that
 
 ## Further Reading
 
@@ -392,11 +446,11 @@ DockYard Academy now recommends you use the latest [Release](https://github.com/
 Run `git status` to ensure there are no undesirable changes.
 Then run the following in your command line from the `curriculum` folder to commit your progress.
 
-```
+```bash
 
-$ git add .
-$ git commit -m "finish Mix reading"
-$ git push
+git add .
+git commit -m "finish Mix reading"
+git push
 
 ```
 
