@@ -214,10 +214,10 @@ defmodule Utils.Notebooks.Notebook do
 
     Run `git status` to ensure there are no undesirable changes.
     Then run the following in your command line from the `curriculum` folder to commit your progress.
-    ```
-    $ git add .
-    $ git commit -m "finish #{notebook.title} #{notebook.type}"
-    $ git push
+    ```bash
+    git add .
+    git commit -m "finish #{notebook.title} #{notebook.type}"
+    git push
     ```
     """
   end

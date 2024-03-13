@@ -166,7 +166,7 @@ iex(1)> PokemonProfile.greet()
 Congratulations! You have just created your first umbrella project!
 For now it contains only a single app. Let's change it.
 
-### Building a pokedex
+## Building a pokedex
 
 We are going to make it more serious. We already can generate and greet single pokemons. Let's organize them into a pokedex.
 We will create a new app for that. It should go as follows:
@@ -202,7 +202,7 @@ Run "mix help" for more commands.
 
 It's your turn, make it happen in your `pokemon_umbrella` project.
 
-#### Implementing Pokedex.random_pack/1
+### Implementing Pokedex.random_pack/1
 
 Now we are going to implement its first feature, returning a random pack of pokemons.
 Specification outline for `Pokedex.random_pack/1`:
@@ -266,7 +266,7 @@ flowchart LR
     end
 ```
 
-### Real use cases
+## Umbrella apps real use cases
 
 Umbrella apps can be used for the following use cases:
 

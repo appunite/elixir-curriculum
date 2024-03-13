@@ -401,9 +401,14 @@ Then run `mix deps.get` to update your project dependencies.
 
 Once installed, you have access to the [Faker](https://hexdocs.pm/faker/readme.html) module.
 
-Instead of hardcoding pokemon names in `PokemonProfile.Name.random/0`, try to use `Faker.Pokemon.name/0`.
+For more on how to use [Faker](https://hexdocs.pm/faker/readme.html), you can read the [Faker Documentation](https://hexdocs.pm/faker/readme.html)
+You can test Faker here:
 
-For more on how to use [Faker](https://hexdocs.pm/faker/readme.html), you can read the [Faker Documentation](https://hexdocs.pm/faker/readme.html).
+```elixir
+Faker.Pokemon.name()
+```
+
+Instead of hardcoding pokemon names in `PokemonProfile.Name.random/0`, try to use `Faker.Pokemon.name/0`.
 
 <!-- livebook:{"force_markdown":true} -->
 
