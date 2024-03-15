@@ -12,6 +12,7 @@ Use the following index to find reading material and exercises for this course.
 ## Phoenix part
 
 - [Phoenix overview](./presentation/phoenix_overview.livemd)
+- [Phoenix app setup](./exercise/phoenix_app_setup.livemd)
 - [Ecto in action](./presentation/ecto_in_action.livemd)
 - [Exposing HTTP API](./presentation/phoenix_http_api.livemd)
 - [Integrating third-party HTTP API with Tesla](./presentation/integrating_third_party_http_api_with_tesla.livemd)

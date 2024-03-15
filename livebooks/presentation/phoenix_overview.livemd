@@ -73,7 +73,7 @@ mix phx.new my_app
 - testing framework **ExUnit**
 - web-framework building blocks
   - HTTP server - leveraging Erlang scalability
-  - websockets support
+  - web-sockets support
   - routing, controllers, plugs (middleware)
 - tools for creating real-time, rich interaction web-apps with [Phoenix LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html)
   - modern component engine (defining attrs, slots, handling actions)
@@ -82,8 +82,9 @@ mix phx.new my_app
 - App localization - [Gettext](https://hexdocs.pm/gettext)
 - LiveDashboard for inspecting deployments [LiveDashboard](https://hexdocs.pm/phoenix_live_dashboard/Phoenix.LiveDashboard.html)
   - ![a](https://github.com/phoenixframework/phoenix_live_dashboard/raw/main/screenshot.png)
-- realease and configuration management - Elixir releases are standalone binaries
+- release and configuration management - Elixir releases are standalone binaries
 - hot code swapping - we can recompile code on the production (useful in certain cases)
+- observability built in the ecosystem - [Telemetry](https://hexdocs.pm/telemetry/Telemetry.html)
 - local and production REPL - IEx
 
 ### How it can be extended further with great libraries:
@@ -106,8 +107,6 @@ Phoenix is heavily influenced by MVC architecture, where an application is broke
 
 More recently, Phoenix has been breaking away from strict MVC architecture, but understanding this style of architecture will help us better understand the overall design choices behind Phoenix.
 
-<!-- livebook:{"break_markdown":true} -->
-
 ![test](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/MVC-Process.svg/300px-MVC-Process.svg.png)
 
 > source: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
@@ -129,8 +128,6 @@ Phoenix generates the following layers of our architecture by default.
 - **Component**: Handles returning the response and may delegate to a template.
 - **Template**: Builds a response, typically using HEEx (HTML + Embedded Elixir) to build an HTML web page.
 
-<!-- livebook:{"break_markdown":true} -->
-
 ![](images/Phoenix%201.7%20Architecture%20Diagram.png)
 
 ## Project Structure
@@ -144,8 +141,7 @@ It is controlled by `--umbrella` argument passed to `mix phx.new`. Our recommend
 
 So what can we expect after running `mix phx.new app --umbrella`? We should have following directory structure:
 
-```
-
+```bash
 ├── README.md
 ├── _build
 ├── .formatter.exs
@@ -194,7 +190,7 @@ So what can we expect after running `mix phx.new app --umbrella`? We should have
 └── mix.lock
 ```
 
-Phoenix projects use [Mix](./mix.livemd) so this folder structure should feel somewhat familiar. Here's a breakdown of each file/folder.
+Phoenix projects use `Mix` so this folder structure should feel somewhat familiar. Here's a breakdown of each file/folder.
 
 ### What's shared between apps:
 
@@ -215,8 +211,9 @@ Phoenix projects use [Mix](./mix.livemd) so this folder structure should feel so
   - **app_web.ex**: The main web module, which configures the Phoenix application.
 - **priv**: The "priv" directory in Phoenix contains resources needed for production that are not part of the source code, including static files such as images and fonts and generated assets from the "assets" directory.
 - **test**: Tests for the application.
-- **formatter.exs**: Formatter configuration.
-- **.gitignore**: Configuration for files that should be ignored in .git.
+- **formatter.exs**
+- **.gitignore**
+- **mix.exs**: Configures the app_web dependencies and settings.
 
 ### In `apps/app` we have place for our domain code:
 
@@ -224,16 +221,34 @@ Phoenix projects use [Mix](./mix.livemd) so this folder structure should feel so
   - **app**: The business logic for the application, organized into contexts.
   - **app.ex**: The main application module, which starts the web server and configures the application.
 - **test**: Tests for the application.
-- **formatter.exs**: Formatter configuration.
-- **.gitignore**: Configuration for files that should be ignored in .git.
-
+- **formatter.exs**
+- **.gitignore**
+- **mix.exs**: Configures the app dependencies and settings.
 <!-- livebook:{"branch_parent_index":2} -->
 
 ## Web Project Structure
 
 Requests flow through the Plug Pipeline. The router, controller, component, and template each play an important role in returning a response to the user request.
 
-<!-- livebook:{"break_markdown":true} -->
+```mermaid
+flowchart TB
+    plug["%Plug.Conn{}"]-->Endpoint
+    Endpoint-->Router
+    Router-->Controller
+    Controller
+```
+
+### Conn
+
+In a Phoenix app, "conn" stands for "connection". It represents the connection between the client and the web server, and contains information about the HTTP request and response.
+
+The conn struct is a central concept in Phoenix and is used extensively throughout the framework. It is created when a client sends a request to the server and is passed around between the various parts of the application as the request is processed.
+
+It contains information such as the HTTP method, the request path, request headers, request body, and response headers. It also includes information about the client's session and any authentication information, among other things.
+
+This is one of numerous examples of so called "token transformation" in Elixir ecosystem. Probably you remember passing list to subsequent `Enum` functions or transforming map with `Map`. Here we have similar pattern, each component accepts and returns `%Plug.Conn{}` structure.
+
+> Can you think of other examples of such transformations in language that you know?
 
 ### Router
 
@@ -258,8 +273,10 @@ scope "/", AppWeb do
   pipe_through :api
 
   get "/posts", PostController, :index
-  get "/posts/:id", PostController, :show
   post "/posts", PostController, :create
+
+  get "/posts/:id", PostController, :show
+  put "/posts/:id", PostController, :update
 end
 ```
 
@@ -282,6 +299,11 @@ defmodule AppWeb.PostController do
     conn
     |> render(:show, post: %{id: id, title: "Post #{id}"})
   end
+
+  def update(conn, %{"id" => id} = params) do
+    conn
+    |> render(:show, post: %{id: id, title: "Post #{id}"})
+  end
 end
 ```
 
@@ -289,7 +311,7 @@ end
 
 Controllers actions accept `params` as the second argument. `params` is a combined map of comma-separated query params, the [body](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) of the request, and dynamic values in the URL.
 
-For example, if we sent a post request to the following URL:
+For example, if we sent a PUT request to the following URL:
 
 http://localhost:4000/api/posts/1/?param1=some_value,param2=some_value
 
@@ -307,7 +329,7 @@ Assuming we had the following route defined.
 
 ```elixir
 
-post "/:id", PageController, :home
+put "/posts/:id", PostController, :update
 ```
 
 Then the `params` in the controller would be bound to:
@@ -323,9 +345,13 @@ Then the `params` in the controller would be bound to:
 }
 ```
 
-<!-- livebook:{"break_markdown":true} -->
+### Assigns
 
-The controller delegates to a [JSON view](https://hexdocs.pm/phoenix/json_and_apis.html#rendering-json) in a corresponding `*JSON` module to return a JSON. The atom `:index` above corresponds to the function `index/1` called in the component module.
+The [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) stores an `assigns` map that is injected into the HEEx template. Values in the `assigns` map can be bound by providing a keyword list as the third argument of the [Controller.render/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#render/3) function.
+
+The controller delegates job to a [JSON view](https://hexdocs.pm/phoenix/json_and_apis.html#rendering-json) in a corresponding `*JSON` module to return a JSON. The atom `:index` above corresponds to the function `index/1` called in the component module. Further arguments are passed to the view module as `assigns`.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 defmodule AppWeb.PostJSON do
@@ -345,20 +371,6 @@ defmodule AppWeb.PostJSON do
   end
 end
 ```
-
-## Conn
-
-In a Phoenix app, "conn" stands for "connection". It represents the connection between the client and the web server, and contains information about the HTTP request and response.
-
-The conn struct is a central concept in Phoenix and is used extensively throughout the framework. It is created when a client sends a request to the server and is passed around between the various parts of the application as the request is processed.
-
-The conn struct contains information such as the HTTP method, the request path, request headers, request body, and response headers. It also includes information about the client's session and any authentication information, among other things.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Assigns
-
-The [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) stores an `assigns` map that is injected into the HEEx template. Values in the `assigns` map can be bound by providing a keyword list as the third argument of the [Controller.render/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#render/3) function.
 
 ## Further Reading
 
