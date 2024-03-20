@@ -203,7 +203,7 @@ Enough talking, let's do some stuff! Remember the `Pokedex.random_pack/1` functi
   - you can generate pokemon name as you want
   - no duplicates
 - expose endpoint `/api/pokemons/random`
-  - it accepts query param `size`, like "/api/pokemons/random?size=10", which is optional
+  - it accepts query param `size`, like `/api/pokemons/random?size=10`, which is optional
   - `size` can't be greater than 20 or negative
   - it renders response as follows:
 
