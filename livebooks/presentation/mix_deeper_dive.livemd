@@ -1,0 +1,482 @@
+# Mix deeper dive
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Phoenix 1.7">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/sql_drills.livemd">SQL Drills</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/web_servers.livemd">Web Servers</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+- What is mix umbrella application and how to create it?
+- How does mix manage umbrella dependencies?
+- How to configure apps?
+- How to cover simple module with unit-tests?
+
+## Umbrella apps
+
+Umbrella apps is a pattern for managing internal dependencies, Mix supports two methods to work with them: Git repositories or umbrella projects.
+Using Git repositories for internal dependencies is somewhat discouraged in Elixir.
+
+Remember that the runtime and the Elixir ecosystem already provide the concept of applications. As such, we expect you to frequently break your code into applications that can be organized logically, even within a single project.
+
+However, if you push every application as a separate project to a Git repository, your projects may become very hard to maintain as you will spend a lot of time managing those Git repositories rather than writing your code.
+
+For this reason, Mix supports **"umbrella projects"** which are used to build applications that run together in a single repository. That is exactly the style we are going to explore in the next sections.
+
+We can create an umbrella project by running the following command:
+
+```bash
+mix new app_name --umbrella
+```
+
+Where `app_name` is the name of the umbrella project.
+
+Further reading:
+[Umbrella apps](https://hexdocs.pm/elixir/dependencies-and-umbrella-projects.html#internal-dependencies)
+
+### Your Turn
+
+Let's create an umbrella project for our pokemons. Use `projects` from previous lesson.
+
+Run generator, you should notice that the command generated several files:
+
+```bash
+cd projects
+mix new pokemon_umbrella --umbrella
+```
+
+<!-- livebook:{"break_markdown":true} -->
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+* creating README.md
+* creating .formatter.exs
+* creating .gitignore
+* creating mix.exs
+* creating apps
+* creating config
+* creating config/config.exs
+
+Your umbrella project was created successfully.
+Inside your project, you will find an apps/ directory
+where you can create and host many apps:
+
+    cd pokemon_umbrella
+    cd apps
+    mix new my_app
+
+Commands like "mix compile" and "mix test" when executed
+in the umbrella project root will automatically run
+for each application in the apps/ directory.
+```
+
+Your project should have the following file and folder structure.
+
+```bash
+pokemon_umbrella/
+  ├── README.md
+  ├── apps
+  ├── config
+  │   └── config.exs
+  └── mix.exs
+```
+
+### Adding first app
+
+We have just created a scaffold for holding our apps. Now, we'll add first one.
+Let's reuse the application from the previous lesson. It should land in `pokemon_umbrella/apps` folder.
+
+Let's copy it:
+
+```bash
+cd projects
+cp -r pokemon_profile pokemon_umbrella/apps
+```
+
+Then we need to fetch dependencies and verify if everything works:
+
+```bash
+cd pokemon_umbrella
+mix deps.get
+```
+
+It will produce:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Resolving Hex dependencies...
+Resolution completed in 0.009s
+New:
+  faker 0.18.0
+* Getting faker (Hex package)
+
+mix test
+
+==> faker
+Compiling 111 files (.ex)
+Generated faker app
+==> pokemon_profile
+Compiling 3 files (.ex)
+Generated pokemon_profile app
+==> pokemon
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+1 doctest, 1 test, 0 failures
+
+Randomized with seed 944308
+```
+
+From now you can use `iex -S mix` in `pokemon_umbrella` project and access `PokemonProfile` module, as previously.
+Let's verify that:
+
+```bash
+iex -S mix
+iex(1)> PokemonProfile.greet()
+"Hello Gorebyss!"
+```
+
+Congratulations! You have just created your first umbrella project!
+For now it contains only a single app. Let's change it.
+
+## Building a pokedex
+
+We are going to make it more serious. We already can generate and greet single pokemons. Let's organize them into a pokedex.
+We will create a new app for that. It should go as follows:
+
+```bash
+cd pokemon_umbrella/apps
+mix new pokedex
+```
+
+It will produce:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+* creating README.md
+* creating .formatter.exs
+* creating .gitignore
+* creating mix.exs
+* creating lib
+* creating lib/pokedex.ex
+* creating test
+* creating test/test_helper.exs
+* creating test/pokedex_test.exs
+
+Your Mix project was created successfully.
+You can use "mix" to compile it, test it, and more:
+
+    cd pokedex
+    mix test
+
+Run "mix help" for more commands.
+```
+
+It's your turn, make it happen in your `pokemon_umbrella` project.
+
+### Implementing Pokedex.random_pack/1
+
+Now we are going to implement its first feature, returning a random pack of pokemons.
+Specification outline for `Pokedex.random_pack/1`:
+
+- it returns list of structs `%Pokedex.Pokemon{name: "name"}`
+- it accepts 1 argument called `size`, which has default value of `5`
+- it returns unique pokemons (no duplicates)
+- it uses `PokemonProfile.Name.random/0` to generate names
+
+You can start as follows:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# apps/pokedex/lib/pokedex.ex
+defmodule Pokedex do
+  def random_pack(_argument) do
+    # TODO: Implementation
+  end
+end
+```
+
+Two important things
+
+1. Cover dependencies explicitly. As we are going to use `:pokemon_profile` app in our `Pokedex`, we should add it as a dependency.
+2. We should also cover unit tests for that scenario. Try to use above specification as a guide.
+
+Declaring umbrella dependencies looks like that:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# apps/pokedex/mix.exs
+defp deps do
+  [
+    {:pokemon_profile, in_umbrella: true}
+  ]
+end
+```
+
+Now we are going into the deeps. Exercise is really close to typical task during development in Elixir. Try to implement it in accordance to above specification.
+
+Let's start!
+
+### Bigger picture how our architecture looks like
+
+```mermaid
+flowchart LR
+    subgraph Umbrella
+      :pokedex-->:pokemon_profile
+
+    end
+
+    subgraph config
+      :pokemon_profile--> config.exs
+      :pokedex--> config.exs
+    end
+
+    subgraph deps
+      :pokemon_profile-->:faker
+    end
+```
+
+## Umbrella apps real use cases
+
+Umbrella apps can be used for the following use cases:
+
+- Multiple teams working on modular monolith application.
+- Logical modularization for bigger apps
+- Separating frontend from backend
+- Flexible deployments scenarios
+- Phoenix app: web + domain
+
+In the repository that implements precard service v2, we also employed umbrella project pattern. It looks like this:
+
+```bash
+apps
+├── healios                  <- the new logic for coordination
+│   ├── README.md
+│   ├── lib
+│   ├── mix.exs
+│   ├── priv
+│   └── test
+├── hs_legacy                <- ACL layer for current system
+│   ├── README.md
+│   ├── lib
+│   ├── mix.exs
+│   └── test
+├── hs_web                   <- frontend for dashboard
+│   ├── README.md
+│   ├── assets
+│   ├── lib
+│   ├── mix.exs
+│   ├── priv
+│   └── test
+└── hsi                       <- infrastructure/utils code for other apps
+    ├── README.md
+    ├── lib
+    ├── mix.exs
+    └── test
+```
+
+```mermaid
+mindmap
+  root((Umbrella apps))
+    **Pros**
+      Easier to manage than git deps
+      Using dependency is explicit
+      No cyclic-dependencies
+      Could be deployed separately
+      Better logical boundaries
+    **Cons / caveats**
+      Using same library versions - can't use Ecto 2.0.0 and 3.0.0 in single project
+      Global configuration
+```
+
+## Configuration
+
+Configuration is an important aspect of umbrella projects. As we mentioned earlier, each app in the umbrella shares the same configuration.
+
+Now we will get hands on with the application configuration. Do you remember `PokemonProfile.Greeter` module from previous exercise? It was intended to greet pokemons. We also introduced `PokemonProfile.Greeter.Formal` but it wasn't attached anywhere.
+
+Let's change it. First we are going to separate abstraction from implementation with the help of behavior [Behaviour](https://hexdocs.pm/elixir/typespecs.html#behaviours).
+
+Previously, `PokemonProfile.Greeter` was implementing common greeting. Let's move it to `PokemonProfile.Greeter.Default` module, and in `PokemonProfile.Greeter` define a `@behaviour` abstraction. We will need `@callback` macro for that.
+
+It should look like that:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# apps/pokemon_profile/lib/pokemon_profile/greeter.ex
+defmodule PokemonProfile.Greeter do
+  @callback hello(String.t()) :: String.t()
+end
+
+
+# apps/pokemon_profile/lib/pokemon_profile/greeter/default.ex
+defmodule PokemonProfile.Greeter.Default do
+  @behaviour PokemonProfile.Greeter
+
+  def hello(pokemon_name) do
+    "Hello #{pokemon_name}!"
+  end
+end
+```
+
+### Behaviour and adapter picking
+
+Try to implement that in your own project. After that run `iex -S mix` and check if it works.
+
+```bash
+iex -S mix
+iex(1)> PokemonProfile.greet()
+** (UndefinedFunctionError) function PokemonProfile.Greeter.hello/1 is undefined or private
+    (pokemon_profile 0.1.0) PokemonProfile.Greeter.hello("Whimsicott")
+    iex:1: (file)
+```
+
+Unfortunately - it doesn't work. We have abstracted the implementation, but the module `PokemonProfile` still calls `PokemonProfile.Greeter` and now it doesn't define function like `hello/1`.
+
+We're gonna change it with the help of Elixir configuration. Let's modify `PokemonProfile.Greeter` as follows:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# apps/pokemon_profile/lib/pokemon_profile/greeter.ex
+defmodule PokemonProfile.Greeter do
+  @callback hello(String.t()) :: String.t()
+
+  @adapter Application.compile_env(:pokemon_profile, :adapter)
+
+  defdelegate hello(pokemon_name), to: @adapter
+end
+```
+
+And now last thing that we need to cover is configuring our app. We are going to prepare file `config/config.exs` as follows:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+#config/config.exs
+import Config
+
+config :pokemon_profile,
+  greeter_adapter: PokemonProfile.Greeter.Formal
+```
+
+Let's check if that works:
+
+```bash
+iex -S mix
+iex(1)> PokemonProfile.greet()
+"Good morning Blastoise."
+```
+
+And after changing the configuration to,
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+#config/config.exs
+import Config
+
+config :pokemon_profile,
+  greeter_adapter: PokemonProfile.Greeter.Default
+```
+
+and restarting application, you should have:
+
+```bash
+iex -S mix
+iex(1)> PokemonProfile.greet()
+"Hello Blastoise!"
+```
+
+### Your turn
+
+Now the challenge for you:
+
+1. Write another implementation of `PokemonProfile.Greeter` -> `PokemonProfile.Greeter.Pirate`, that greets pokemons with "Ahoy pokemon_name !!!"
+2. Pick "adapter" on the fly, based on module 3 operation on the number of letters in pokemon name as follows:
+
+- "Blastoise" -> 9 letters -> mod 3 -> 0 -> `PokemonProfile.Greeter.Default`
+- "Pikachu" -> 7 letters -> mod 3 -> 1 -> `PokemonProfile.Greeter.Formal`
+- "Sewaddle" -> 8 letters -> mod 3 -> 2 -> `PokemonProfile.Greeter.Pirate`
+
+3. (more difficult) - write unit tests for that
+
+## Further Reading
+
+For more on [Mix](https://hexdocs.pm/mix/Mix.html), consider reading the following.
+
+- [elixir-lang: Intro to Mix](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html)
+- [HexDocs: Mix](https://hexdocs.pm/mix/Mix.html#content)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```bash
+
+git add .
+git commit -m "finish Mix reading"
+git push
+
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Mix">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/pascals_triangle.livemd">Pascal's Triangle</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/games.livemd">Games Project</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+```

@@ -1,13 +1,35 @@
-# Mix presentation
+# Mix introduction
 
 ```elixir
 Mix.install([
   {:jason, "~> 1.4"},
   {:kino, "~> 0.9", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:faker, "~> 0.18.0"}
 ])
 ```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Phoenix 1.7">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/sql_drills.livemd">SQL Drills</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/web_servers.livemd">Web Servers</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
 
 ## Review Questions
 
@@ -16,6 +38,9 @@ Upon completing this lesson, a student should be able to answer the following qu
 - What is the purpose of Mix?
 - Where should our application go inside of a mix project?
 - How do we compile a mix project and explore it using the IEx shell?
+- How do we run tests?
+- How do we add and manage dependencies in mix project?
+- What is Elixir formatter and how to use it?
 
 ## Mix
 
@@ -23,36 +48,47 @@ Upon completing this lesson, a student should be able to answer the following qu
 
 We start a new Mix application by running the following in the command line.
 
-```
+```bash
 mix new app_name
 ```
 
 Where `app_name` is the name of the project.
 
-<!-- livebook:{"break_markdown":true} -->
-
 ### Your Turn
 
-Create a `hello_world` application.
+Create a `pokemon_profile` application. Use `projects` directory for that.
+If you haven't one, create it:
+
+```bash
+mkdir -p projects
+cd projects
+```
+
+Run mix generator:
+
+```bash
+mix new pokemon_profile
+```
 
 You should notice that the command generated several files.
 
-```
-$ mix new hello_world
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
 * creating README.md
 * creating .formatter.exs
 * creating .gitignore
 * creating mix.exs
 * creating lib
-* creating lib/hello_world.ex
+* creating lib/pokemon_profile.ex
 * creating test
 * creating test/test_helper.exs
-* creating test/hello_world_test.exs
+* creating test/pokemon_test.exs
 
 Your Mix project was created successfully.
 You can use "mix" to compile it, test it, and more:
 
-    cd hello_world
+    cd pokemon
     mix test
 
 Run "mix help" for more commands.
@@ -60,17 +96,17 @@ Run "mix help" for more commands.
 
 Your project should have the following file and folder structure.
 
-```
-hello_world/
-  lib/
-    hello_world.ex
-  test/
-    hello_world_test.exs
-    test_helper.exs
-  .formatter.exs
-  .gitignore
-  mix.exs
-  README.md
+```bash
+pokemon_profile
+├── .formatter.exs
+├── .gitignore
+├── README.md
+├── lib
+│   └── pokemon_profile.ex
+├── mix.exs
+└── test
+    ├── pokemon_profile_test.exs
+    └── test_helper.exs
 ```
 
 We'll walk through the mix project structure and how you can build Elixir applications.
@@ -78,14 +114,16 @@ We'll walk through the mix project structure and how you can build Elixir applic
 ## The `lib` Folder
 
 The `lib/` folder contains the files for the project. We start with a single module
-named after the project. You should have a `HelloWorld` module in the `lib/hello_world.ex` file.
+named after the project. You should have a `PokemonProfile` module in the `lib/pokemon_profile.ex` file.
 
 We use `@moduledoc` and `@doc` to document our code.
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
-defmodule HelloWorld do
+defmodule PokemonProfile do
   @moduledoc """
-  Documentation for `HelloWorld`.
+  Documentation for `Pokemon`.
   """
 
   @doc """
@@ -93,7 +131,7 @@ defmodule HelloWorld do
 
   ## Examples
 
-      iex> HelloWorld.hello()
+      iex> PokemonProfile.hello()
       :world
 
   """
@@ -108,7 +146,7 @@ end
 To execute the Elixir code for our Mix project, you can load the project into the IEx Shell
 by running the following command in the project folder.
 
-```
+```bash
 iex -S mix
 ```
 
@@ -120,14 +158,14 @@ Now, all of the `.ex` files and modules under the `lib/` folder are available in
 
 Load your project into the IEx Shell.
 
-```
+```bash
 iex -S mix
 ```
 
 Call the `hello/0` function.
 
-```
-iex> HelloWorld.hello()
+```bash
+iex> PokemonProfile.hello()
 :world
 ```
 
@@ -139,46 +177,44 @@ You can also compile the project by running `mix compile` in the command line.
 
 [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) is a built-in testing framework. Test files are under the `test/` folder in `.exs` files.
 
-In your `hello_world` project, there should be an example test file `test/hello_world_test.exs` with
+In your `pokemon` project, there should be an example test file `test/pokemon_test.exs` with
 the following content.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule HelloWorldTest do
+defmodule PokemonProfileTest do
   use ExUnit.Case
-  doctest HelloWorld
+  doctest Pokemon
 
   test "greets the world" do
-    assert HelloWorld.hello() == :world
+    assert PokemonProfile.hello() == :world
   end
 end
 ```
 
 Test files generally correspond to another file in the `lib/` folder.
 
-For example, a `lib/greeting/hola.ex` file might have a corresponding `test/greeting/hola_test.exs` file.
+For example, a `lib/pokemon_profile/greeter/formal.ex` file might have a corresponding `test/pokemon_profile/greeter/formal_test.exs` file.
 
-We will dive deeper into how to test Elixir projects in the [ExUnit](exunit.livemd) section.
+We will dive deeper into how to test Elixir projects later on
 
 For now, know that you can execute all of your tests by running the following in the command line.
 
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-$ mix test
+```bash
+mix test
 ```
 
 ### Your Turn
 
-Run `mix test` in your `hello_world` project folder from the command line, and you
+Run `mix test` in your `pokemon_profile` project folder from the command line, and you
 should see an output similar to the following.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 Compiling 1 file (.ex)
-Generated hello_world app
+Generated pokemon_profile app
 ..
 
 Finished in 0.02 seconds (0.00s async, 0.02s sync)
@@ -193,45 +229,50 @@ Mix compiles all `.ex` files under the `lib/` folder and bundles them together i
 
 Generally, Elixir projects organize modules under the main project namespace.
 
-So all of the modules in the `HelloWorld` application would be grouped under the `HelloWorld` namespace.
+So all of the modules in the `PokemonProfile` application would be grouped under the `PokemonProfile` namespace.
 
-For example, a new `Greeting` module would be defined under `HelloWorld.Greeting`.
+For example, a new `Greeter` module would be defined under `PokemonProfile.Greeter`.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule HelloWorld.Greeting do
-  def salutations(name) do
-    "Salutations, #{name}!"
+defmodule PokemonProfile.Greeter do
+  def hello(pokemon_name) do
+    "Hello #{pokemon_name}!"
   end
 end
 ```
 
-Nested modules generally
-relate to each other, often sub-modules deal with a more specific application of the higher-level module.
+Nested modules generally relate to each other, often sub-modules deal with a more specific application of the higher-level module.
 
-For example, a `Formal` module would be under the `Greeting` module.
+For example, a `Formal` module would be under the `Greeter` module.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule HelloWorld.Greeting.Formal do
-  def charmed() do
-    "Charmed, I'm sure."
+defmodule PokemonProfile.Greeter.Formal do
+  def hello(pokemon_name) do
+    "Good morning #{pokemon_name}."
   end
 end
 ```
 
 While not enforced, module and file structure often follow a pattern, where the module name matches its folder and file.
 
-For example, the `HelloWorld.Greeting.Formal` module would be in a `lib/greeting/formal.ex` file,
-and the `HelloWorld.Greeting` will be in the `lib/greeting.ex` file.
+For example, the `PokemonProfile.Greeter.Formal` module would be in a `lib/pokemon_profile/greeter/formal.ex` file,
+and the `PokemonProfile.Greeter` will be in the `lib/pokemon_profile/greeter.ex` file.
 
-```
-lib/
-  greeting.ex
-  hello_world.ex
-  greeting/
-    formal.ex
+```bash
+lib
+├── pokemon_profile
+│   ├── greeter
+│   │   └── formal.ex
+│   ├── greeter.ex
+│   └── name.ex
+└── pokemon_profile.ex
 ```
 
-### Your Turn
+### Calling other modules
 
 Modules can call functions from any other modules in `.ex` files under the `lib/` folder,
 just as you have already seen in livebook cells.
@@ -252,40 +293,56 @@ end
 ModuleB.run()
 ```
 
-In your `hello_world` application, create a new module, `HelloWorld.Name` in a `lib/name.ex` file, which will return a random name.
+### Your Turn
+
+In your `pokemon_profile` application, create a new module, `PokemonProfile.Name` in a `lib/pokemon_profile/name.ex` file, which will return a random name.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule HelloWorld.Name do
+defmodule PokemonProfile.Name do
   def random do
-    Enum.random(["Peter", "Bruce", "Tony"])
+    ["Pikachu", "Charizard", "Bulbasaur"]
+    |> Enum.random()
   end
 end
 ```
 
-Then, call the `HelloWorld.Name.random/0` function from the `HelloWorld` module in `hello_world.ex`.
-
-<!-- livebook:{"break_markdown":true} -->
+Then, call the `PokemonProfile.Name.random/0` function from the `PokemonProfile` module in `pokemon_profile.ex`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule HelloWorld do
-  def hello do
-    "Hello, #{HelloWorld.Name.random()}."
+defmodule PokemonProfile do
+  def greet do
+    PokemonProfile.Name.random()
+    |> PokemonProfile.Greeter.hello()
   end
 end
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-Run your project in the [IEx](https://hexdocs.pm/iex/IEx.html) shell and ensure the `HelloWorld.hello/0` function works as expected.
+Also module names can be aliased to make them easier to call:
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-$ iex -S mix
-iex> HelloWorld.hello()
-"Hello, Peter."
+defmodule PokemonProfile do
+  alias PokemonProfile.Name
+  alias PokemonProfile.Greeter
+
+  def greet do
+    Name.random()
+    |> Greeter.hello()
+  end
+end
+```
+
+Run your project in the [IEx](https://hexdocs.pm/iex/IEx.html) shell and ensure the `PokemonProfile.greet/0` function works as expected.
+
+```bash
+iex -S mix
+iex> PokemonProfile.greet()
+"Hello, Pikachu!"
 ```
 
 ## Mix.exs
@@ -322,7 +379,7 @@ in `mix.exs`. Notice that `mix.exs` includes comments on installing a dependency
 
 ### Your Turn
 
-Add the [Faker](https://hex.pm/packages/faker) project to your `hello_world` application.
+Add the [Faker](https://hex.pm/packages/faker) project to your `:pokemon_profile` application.
 [Faker](https://hexdocs.pm/faker/readme.html) provides functions for generating fake data, often useful for randomized test data.
 
 It's often most reliable to check the [Hex page](https://hex.pm/packages/faker) of a project for the latest version.
@@ -332,9 +389,10 @@ Ensure you add `:faker` with the latest version to the `deps/0` function in `mix
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+  # mix.exs
   defp deps do
     [
-      {:faker, "~> 0.17.0"}
+      {:faker, "~> 0.18.0"}
     ]
   end
 ```
@@ -343,29 +401,36 @@ Then run `mix deps.get` to update your project dependencies.
 
 Once installed, you have access to the [Faker](https://hexdocs.pm/faker/readme.html) module.
 
-Use the `Faker.Person.first_name/0` function in your `HelloWorld.hello/0` function.
+For more on how to use [Faker](https://hexdocs.pm/faker/readme.html), you can read the [Faker Documentation](https://hexdocs.pm/faker/readme.html)
+You can test Faker here:
 
-For more on how to use [Faker](https://hexdocs.pm/faker/readme.html), you can read the [Faker Documentation](https://hexdocs.pm/faker/readme.html).
+```elixir
+Faker.Pokemon.name()
+```
+
+Instead of hardcoding pokemon names in `PokemonProfile.Name.random/0`, try to use `Faker.Pokemon.name/0`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-def hello do
-  "Hello, #{Faker.Person.first_name()}."
+defmodule PokemonProfile.Name do
+  def random do
+    Faker.Pokemon.name()
+  end
 end
 ```
 
-Ensure your `hello/0` function works in the IEx shell.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-iex -S mix
-iex> HelloWorld.hello()
-"Hello, Salvador." # The name will be random each time.
-```
-
 <!-- livebook:{"break_markdown":true} -->
+
+So now, running `PokemonProfile.greet/0` in [IEx](https://hexdocs.pm/iex/IEx.html) shell, will return greeting for a random pokemon from [Faker](https://hexdocs.pm/faker) library.
+
+Try it:
+
+```bash
+iex -S mix
+iex> PokemonProfile.greet()
+"Hello, Pikachu!"
+```
 
 ### Versions
 
@@ -386,13 +451,13 @@ The [Version documentation](https://hexdocs.pm/elixir/Version.html) goes into fu
 
 You can automatically update project versions by running the following in your command line.
 
-```
+```bash
 mix deps.update example_dep
 ```
 
 Or with the `--all` option to update all deps.
 
-```
+```bash
 mix deps.update --all
 ```
 
@@ -400,11 +465,17 @@ mix deps.update --all
 
 The `.formatter.exs` file contains project configuration for how to format Elixir source code files automatically.
 
-You can run `mix format` from the command line in the project folder to format elixir code.
+You can run:
+
+```bash
+mix format
+```
+
+from the command line in the project folder to format elixir code.
 
 ### Your Turn
 
-Indent the code in `hello_world.ex`. Then, run `mix format` and notice the code automatically
+Indent the code in `lib/pokemon_profile.ex`. Then, run `mix format` and notice the code automatically
 formats. If it does not, ensure that you do not have syntax errors that prevent code formatting.
 
 ## README.md
@@ -429,21 +500,20 @@ View the [Markdown cheat-sheet](https://www.markdownguide.org/cheat-sheet/) for 
 
 Mix projects can run in different environments. The default environment is your development `:dev` environment.
 
-Run your `hello_world` project in the IEx shell and call `Mix.env()` to see that `:dev` is the current environment.
+Run your `pokemon` project in the IEx shell and call `Mix.env()` to see that `:dev` is the current environment.
 
 <!-- livebook:{"force_markdown":true} -->
 
-```elixir
-$ iex -S mix
+```bash
+iex -S mix
 iex> Mix.env()
 :dev
 ```
 
 The project will use the `:test` environment when running tests and `:prod` when deployed to production.
 
-We can change project behavior or configuration based on the current environment. For example,
-if you had SMS (text) notifications in your project, you might want to disable them in the `:dev` and `:test`
-environment to ensure that developers don't accidentally send out text messages to users.
+We can change project behavior or configuration based on the current environment.
+For example, if you had SMS (text) notifications in your project, you might want to disable them in the `:dev` and `:test` environment to ensure that developers don't accidentally send out text messages to users.
 
 ## Further Reading
 
@@ -460,9 +530,9 @@ Run `git status` to ensure there are no undesirable changes.
 Then run the following in your command line from the `curriculum` folder to commit your progress.
 
 ```
-$ git add .
-$ git commit -m "finish Mix reading"
-$ git push
+git add .
+git commit -m "finish Mix reading"
+git push
 ```
 
 We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.

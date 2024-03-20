@@ -1,0 +1,221 @@
+# Phoenix app setup
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Review Questions
+
+- How does router, controller and Plug interact to fulfill the job?
+- How to add additional endpoint to web app?
+- How to expose list of JSONs in controller?
+- How to add resource creation to the controller?
+- How Plug can be leveraged to implement basic authentication?
+- Can I implement pagination?
+- Can I plan whole flow of typical CRUD scenario? (router + controller + context + DB)
+
+## Bootstrap Phoenix
+
+In previous lesson we went through a lot of new things, now it's time to test in on a battlefield. Let's create our first Phoenix app. If you didn't installed Phoenix previously, this is the good moment to do that:
+
+```bash
+mix archive.install hex phx_new
+```
+
+Then, run in your `projects` directory:
+
+```bash
+mix phx.new pokemon  --umbrella --binary-id --database postgres
+```
+
+and tap `y` when prompted. You should have:
+
+<!-- livebook:{"break_markdown":true} -->
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+* creating pokemon_umbrella/.gitignore
+* creating pokemon_umbrella/config/config.exs
+* creating pokemon_umbrella/config/dev.exs
+* creating pokemon_umbrella/config/test.exs
+* creating pokemon_umbrella/config/prod.exs
+* creating pokemon_umbrella/config/runtime.exs
+* creating pokemon_umbrella/mix.exs
+* creating pokemon_umbrella/README.md
+* creating pokemon_umbrella/.formatter.exs
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web.ex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/application.ex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/endpoint.ex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/router.ex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/telemetry.ex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/controllers/error_json.ex
+* creating pokemon_umbrella/apps/pokemon_web/mix.exs
+* creating pokemon_umbrella/apps/pokemon_web/README.md
+* creating pokemon_umbrella/apps/pokemon_web/.gitignore
+* creating pokemon_umbrella/apps/pokemon_web/test/test_helper.exs
+* creating pokemon_umbrella/apps/pokemon_web/test/support/conn_case.ex
+* creating pokemon_umbrella/apps/pokemon_web/test/pokemon_web/controllers/error_json_test.exs
+* creating pokemon_umbrella/apps/pokemon_web/.formatter.exs
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/components/core_components.ex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/components/layouts.ex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/controllers/page_controller.ex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/controllers/error_html.ex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/controllers/page_html.ex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/controllers/page_html/home.html.heex
+* creating pokemon_umbrella/apps/pokemon_web/test/pokemon_web/controllers/page_controller_test.exs
+* creating pokemon_umbrella/apps/pokemon_web/test/pokemon_web/controllers/error_html_test.exs
+* creating pokemon_umbrella/apps/pokemon_web/assets/vendor/topbar.js
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/components/layouts/root.html.heex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/components/layouts/app.html.heex
+* creating pokemon_umbrella/apps/pokemon_web/lib/pokemon_web/gettext.ex
+* creating pokemon_umbrella/apps/pokemon_web/priv/gettext/en/LC_MESSAGES/errors.po
+* creating pokemon_umbrella/apps/pokemon_web/priv/gettext/errors.pot
+* creating pokemon_umbrella/apps/pokemon_web/priv/static/robots.txt
+* creating pokemon_umbrella/apps/pokemon_web/priv/static/favicon.ico
+* creating pokemon_umbrella/apps/pokemon_web/assets/js/app.js
+* creating pokemon_umbrella/apps/pokemon_web/assets/vendor/topbar.js
+* creating pokemon_umbrella/apps/pokemon_web/assets/css/app.css
+* creating pokemon_umbrella/apps/pokemon_web/assets/tailwind.config.js
+* creating pokemon_umbrella/apps/pokemon/lib/pokemon/application.ex
+* creating pokemon_umbrella/apps/pokemon/lib/pokemon.ex
+* creating pokemon_umbrella/apps/pokemon/test/test_helper.exs
+* creating pokemon_umbrella/apps/pokemon/README.md
+* creating pokemon_umbrella/apps/pokemon/mix.exs
+* creating pokemon_umbrella/apps/pokemon/.gitignore
+* creating pokemon_umbrella/apps/pokemon/.formatter.exs
+* creating pokemon_umbrella/apps/pokemon/lib/pokemon/repo.ex
+* creating pokemon_umbrella/apps/pokemon/priv/repo/migrations/.formatter.exs
+* creating pokemon_umbrella/apps/pokemon/priv/repo/seeds.exs
+* creating pokemon_umbrella/apps/pokemon/test/support/data_case.ex
+* creating pokemon_umbrella/apps/pokemon/lib/pokemon/mailer.ex
+
+Fetch and install dependencies? [Yn] y
+* running mix deps.get
+* running mix assets.setup
+* running mix deps.compile
+
+We are almost there! The following steps are missing:
+
+    $ cd pokemon_umbrella
+
+Then configure your database in config/dev.exs and run:
+
+    $ mix ecto.create
+
+Start your Phoenix app with:
+
+    $ mix phx.server
+
+You can also run your app inside IEx (Interactive Elixir) as:
+
+    $ iex -S mix phx.server
+```
+
+Now we need to setup DB and run the app:
+
+```bash
+mix ecto.create
+iex -S mix phx.server
+```
+
+And after visiting http://localhost:4000 you should have:
+![](images/phoenix_hello_world.png)
+
+### Phoenix umbrella?
+
+As you probably recognize in generator, we ran it with `--umbrella` argument, which means that we created an umbrella project. Our previous umbrella app looked like this:
+
+```mermaid
+flowchart LR
+    subgraph Umbrella
+      :pokedex-->:pokemon_profile
+
+    end
+
+    subgraph config
+      :pokemon_profile--> config.exs
+      :pokedex--> config.exs
+    end
+
+    subgraph deps
+      :pokemon_profile-->:faker
+    end
+```
+
+What we have now in Phoenix? It looks like this:
+
+```mermaid
+---
+title: Phoenix Umbrella
+---
+flowchart TB
+    subgraph :pokemon_web [PokemonWeb]
+        direction TB
+        PokemonWeb.PokemonController
+        PokemonWeb.PokemonJSON
+    end
+
+    subgraph :pokemon [Pokemon]
+      direction TB
+      context1["Pokemon.Context1"]
+      context2["Pokemon.Context2"]
+      context3["Pokemon.Context3"]
+    end
+
+    subgraph config
+      config.exs --> dev.exs
+      config.exs --> prod.exs
+    end
+
+    subgraph deps
+      :faker
+      :plug
+    end
+
+    :pokemon_web --> :pokemon
+
+    :pokemon_web --> config
+    :pokemon --> config
+    :pokemon_web --> deps
+    :pokemon --> deps
+```
+
+So we have 2 apps generated in umbrella, one for the "domain" and one for web adapter for it (framework stuff). Moreover, the domain consists of few "Contexts". Each of it should represent some aspect of the domain. In typical app it could be `Accounts`, `Patients`, or `MedicalRecords`. Phoenix encourages dividing your "business code" from the "framework code". That supports long term maintainability and allows smaller teams to achieve more without costly rewrites.
+
+More reading about Phoenix Contexts available [here](https://hexdocs.pm/phoenix/contexts.html).
+
+## Your Turn
+
+Enough talking, let's do some stuff! Remember the `Pokedex.random_pack/1` function? Our job now is expose it via API in Phoenix. Requirements break down:
+
+- add context `Pokemon.Pokedex`
+- add `Pokemon.Pokedex.random_pack/1` function
+  - it returns 5 random pokemons
+  - it accepts 1 argument called `size`, which has default value of `5`
+  - list contains `%Pokedex.Pokemon{name: "name"}` structs
+  - you can generate pokemon name as you want
+  - no duplicates
+- expose endpoint `/api/pokemons/random`
+  - it accepts query param `size`, like "/api/pokemons/random?size=10", which is optional
+  - `size` can't be greater than 20 or negative
+  - it renders response as follows:
+
+```json
+"data": [
+  {
+    "name": "name1"
+  },
+  {
+    "name": "name2"
+  }
+]
+```
+
+> TIP: `PostController`, `PostJSON` and `Router` from previous lesson can work as example.
+
+### Phoenix
