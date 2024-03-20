@@ -9,6 +9,8 @@ Mix.install([
 ])
 ```
 
+## Navigation
+
 ## Review Questions
 
 - How does router, controller and Plug interact to fulfill the job?
@@ -218,4 +220,6 @@ Enough talking, let's do some stuff! Remember the `Pokedex.random_pack/1` functi
 
 > TIP: `PostController`, `PostJSON` and `Router` from previous lesson can work as example.
 
-### Phoenix
+## Commit Your Progress
+
+## Navigation
