@@ -47,15 +47,6 @@ Requirements breakdown:
 - wire previous function `Pokemon.Pokedex.random_pack/1` with DB storage
 - expose all new pokemon fields in `/api/pokemons/random` endpoint
 
-## Further Reading
-
-Consider the following resource(s) to deepen your understanding of the topic.
-
-- [Phoenix Generators: mix phx.gen](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.html#content)
-- [Phoenix HTML Generator: mix phx.gen.html](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.html#content)
-- [Phoenix Schema Generator Types](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Schema.html#module-attributes)
-- [Pragmatic Bookshelf: Programming Ecto](https://pragprog.com/titles/wmecto/programming-ecto/)
-
 ## Commit Your Progress
 
 ## Navigation

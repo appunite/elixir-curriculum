@@ -1,0 +1,89 @@
+# Environment setup
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+## Plan
+
+> Note: This guide assumes OSX machines for development
+
+### asdf
+
+Install asdf. It’s runtime version manager instructions [here](https://asdf-vm.com/guide/getting-started.html)
+
+### Elixir & Erlang
+
+install erlang and elixir - Elixir is build on a top of BEAM thus it requires erlang
+
+```bash
+asdf plugin add erlang
+asdf plugin add elixir
+asdf install erlang 25.3.2.8
+asdf install elixir 1.16.0
+```
+
+Setup elixir & erlang version as default
+
+```bash
+asdf global erlang 25.3.2.8
+asdf global elixir 1.16.0
+```
+
+### Phoenix
+
+Install Phoenix - web framework for Elixir - https://hexdocs.pm/phoenix/installation.html
+
+```bash
+mix archive.install hex phx_new
+```
+
+### PostgreSQL
+
+```bash
+brew install postgresql
+```
+
+### IDE - VSCode + plugins
+
+For the ease of conducting workshops we would like you to work on VSCode. With companion of extensions it has supports Elixir really well.
+You can download it here: https://code.visualstudio.com/download
+
+After installation, please add extensions:
+
+- [ElixirLS: Elixir support and debugger](https://marketplace.visualstudio.com/items?itemName=JakeBecker.elixir-ls)
+
+### Prepare projects directory
+
+In the directory that contains `day2.livemd` file (HOME_DIR later on), create a new directory for our sample projects.
+
+```bash
+mkdir -p projects
+```
+
+### Git
+
+(only if you haven't it already)
+
+```bash
+brew install git
+```
+
+and initialize new git repo in the HOME_DIR:
+
+```bash
+git init
+git add .
+git commit -m "day 2 init"
+```
+
+That's it you are ready to go!
+
+## Navigation
