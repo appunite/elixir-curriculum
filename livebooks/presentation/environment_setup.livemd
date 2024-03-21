@@ -26,15 +26,24 @@ install erlang and elixir - Elixir is build on a top of BEAM thus it requires er
 ```bash
 asdf plugin add erlang
 asdf plugin add elixir
-asdf install erlang 25.3.2.8
-asdf install elixir 1.16.0
+asdf install erlang 26.2.1
+asdf install elixir 1.16.2-otp-26
 ```
 
-Setup elixir & erlang version as default
+Setup elixir & erlang version as default:
 
 ```bash
-asdf global erlang 25.3.2.8
-asdf global elixir 1.16.0
+asdf global erlang 26.2.1
+asdf global elixir 1.16.2-otp-26
+```
+
+Check elixir version:
+
+```bash
+elixir -v
+Erlang/OTP 26 [erts-14.2.3] [source] [64-bit] [smp:10:10] [ds:10:10:10] [async-threads:1] [jit]
+
+Elixir 1.16.2 (compiled with Erlang/OTP 26)
 ```
 
 ### Phoenix
@@ -43,6 +52,13 @@ Install Phoenix - web framework for Elixir - https://hexdocs.pm/phoenix/installa
 
 ```bash
 mix archive.install hex phx_new
+```
+
+Check version:
+
+```bash
+mix phx.new --version
+Phoenix installer v1.7.11
 ```
 
 ### PostgreSQL
