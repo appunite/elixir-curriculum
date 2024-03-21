@@ -1,7 +1,11 @@
 # Day 2
 
-At Day 1 you have learned fundamentals of Elixir and functional programming. We hope that was a fun!
-Today our schedule is
+At Day 1 you have learned fundamentals of Elixir and functional programming. We hope that was fun!
+
+Today our schedule is to dig into Elixir project tooling, Phoenix, and Ecto. Moreover, we formulated the exercises to closely reflect real-world web-app scenarios.
+
+## Reading material and exercises
+
 Use the following index to find reading material and exercises for this course.
 
 ## Mix introduction
@@ -13,12 +17,13 @@ Use the following index to find reading material and exercises for this course.
 
 - [Phoenix overview](./presentation/phoenix_overview.livemd)
 - [Phoenix app setup](./exercise/phoenix_app_setup.livemd)
-- [Ecto in action](./presentation/ecto_in_action.livemd)
-- [Exposing HTTP API](./presentation/phoenix_http_api.livemd)
-- [Integrating third-party HTTP API with Tesla](./presentation/integrating_third_party_http_api_with_tesla.livemd)
+- [Ecto introduction](./presentation/ecto_introduction.livemd)
+- [Ecto in action](./exercise/ecto_in_action.livemd)
 
 ## Extras
 
+- [Advanced HTTP API](./presentation/phoenix_http_api.livemd)
+- [Integrating third-party HTTP API with Tesla](./presentation/integrating_third_party_http_api_with_tesla.livemd)
 - Simple UI with LiveView and generators
 - Oban introduction and async work
 - Reactive UI with LV and PubSub

@@ -9,6 +9,8 @@ Mix.install([
 ])
 ```
 
+## Navigation
+
 ## Review Questions
 
 - How does router, controller and Plug interact to fulfill the job?
@@ -197,11 +199,11 @@ Enough talking, let's do some stuff! Remember the `Pokedex.random_pack/1` functi
 - add `Pokemon.Pokedex.random_pack/1` function
   - it returns 5 random pokemons
   - it accepts 1 argument called `size`, which has default value of `5`
-  - list contains `%Pokedex.Pokemon{name: "name"}` structs
+  - list contains `%Pokemon.Pokedex.Pokemon{name: "name"}` structs
   - you can generate pokemon name as you want
   - no duplicates
 - expose endpoint `/api/pokemons/random`
-  - it accepts query param `size`, like "/api/pokemons/random?size=10", which is optional
+  - it accepts query param `size`, like `/api/pokemons/random?size=10`, which is optional
   - `size` can't be greater than 20 or negative
   - it renders response as follows:
 
@@ -218,4 +220,6 @@ Enough talking, let's do some stuff! Remember the `Pokedex.random_pack/1` functi
 
 > TIP: `PostController`, `PostJSON` and `Router` from previous lesson can work as example.
 
-### Phoenix
+## Commit Your Progress
+
+## Navigation

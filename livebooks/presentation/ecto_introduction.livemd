@@ -1,4 +1,4 @@
-# Phoenix And Ecto
+# Ecto introduction
 
 ```elixir
 Mix.install([
@@ -13,16 +13,13 @@ Mix.install([
 
 ## Review Questions
 
-Upon completing this lesson, a student should be able to answer the following questions.
-
-- How do we generate a resource in a Phoenix application?
-- Explain Contexts, Schemas, Migrations, and Repo.
+- What are the main parts of Ecto?
+- What Ecto is and what isn’t?
+- How to blend schema, validations, contraints and migrations?
+- How typical CRUD context is organized?
+- How to construct basic queries?
 
 ## Overview
-
-This is a companion reading for the [Blog: Posts](../exercises/blog_posts.livemd) exercise. This lesson is an overview of how to work with a database using Ecto in a Phoenix application.
-
-<!-- livebook:{"break_markdown":true} -->
 
 ### Ecto
 
@@ -39,43 +36,40 @@ By default, [Ecto](https://hexdocs.pm/ecto/Ecto.html) uses a [PostgreSQL](https:
 
 [Phoenix](https://hexdocs.pm/phoenix/Phoenix.html) uses [Ecto](https://hexdocs.pm/ecto/Ecto.html) to handle the data layer of a web application.
 
-<!-- livebook:{"break_markdown":true} -->
+### ORM?
 
-### Domain
+It's worth noting that is not a typical ORM. First of all, Elixir doesn't have objects, so that won't be possible. But that is a little bit semantic explanation.
 
-In a Phoenix application, by default, there are four main modules responsible for managing business logic and the domain of our application. They are:
+Ecto supports some of the features that classical ORMs provide, like data casting, providing migrations or mapping associations like `has_many` or `belongs_to`. But it provides them without complex "black magic".
+For instance, in ORM you might have `user` object, and you can autoload associations by calling `user.posts` or even `user.posts.last.comments`. That's handy, but also hazardous. It might end with a serious N+1 query problem, when done carelessly.
 
-- **Contexts**: They encapsulate specific domain areas, define the business logic and data access functions, and provide an API to expose functionality to other parts of the application.
+In Ecto you can achieve that, but you need to be **explicit**. So instead of something like `%User{}.posts`, you need to explicitly call `%User{} |> Repo.preload(:posts)`. This way allows you to achieve all you want, but also leaves a lot more control in your hand.
 
-- **Schemas**: They define the structure of the data entities in the domain, including fields, types, and constraints.
+We can call Ecto a "database toolkit" with all the necessary features required for building modern web apps prebaked, that isn't "automagical" and encourages you to stay explicit.
 
-- **Repo**: It provides an abstraction layer for interacting with the database, encapsulating queries, and providing a clean interface to perform CRUD operations on the entities defined in **Schema** modules.
+## Example context walkthrough
 
-- **Migrations**: They define changes to the database schema over time, such as creating or updating tables and columns.
-
-Together, these modules provide a way to model the business logic and data entities in the application and work with a database. Note that we are not limited to these modules, but this is how Phoenix organizes an application by default.
-
-## Generators
+### Generator
 
 We can define all of the necessary modules and boilerplate for part of our domain using the phoenix generators.
 
 For example, we could generate posts in a blog project with the following command.
 
 ```
-mix phx.gen.html Posts Post posts title:string body:text
+mix phx.gen.context Posts Post posts title:string:unique subtitle:string content:text
 ```
 
 The command above would to the following:
 
-- Create a **Posts** context.
-- Create a **Post** schema
-- Creates a **posts** table in the database with the `title:string` and `body:text` fields. See the [Attributes](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Schema.html#module-attributes) documentation for a complete list of attribute types.
-
-It also generates boilerplate for the web layer of our application including the controller, component, and template. It does not generate routes for our router though, as these have to be manually inserted.
+- Creates a **Posts** context.
+- Creates a **Post** schema
+- Creates a **posts** table in the database with the `title:string`, `subtitle:string`, and `content:text` fields. See the [Attributes](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Schema.html#module-attributes) documentation for a complete list of attribute types.
+- Generates tests for **Posts** and **Post**
+- Setup fixtures
 
 See [mix phx.gen](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.html) for a complete list of phoenix generators.
 
-## Context
+### Context
 
 Phoenix contexts are a way of organizing related functionality in a Phoenix application. Each context represents a coherent set of operations that relate to a specific domain or aspect of the application's functionality.
 
@@ -122,7 +116,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Ecto.Query
+#### Ecto.Query
 
 `Ecto.Query` is imported in the example above. Contexts often work with `Ecto.Query` when writing queries for retrieving and manipulating data in a database.
 
@@ -156,11 +150,11 @@ Ecto allows for a pipeable syntax that some developers prefer. For example, the 
   end
 ```
 
-## Schema
+### Schema
 
 In Ecto, a schema is a module that defines the structure and properties of a database table. The schema maps the fields of the table to the fields of the struct in the module, and it also defines any constraints or validations on those fields.
 
-Here's an example of a `Post` schema that defines a post with `title`, `subtitle`, and `content` fields. We also see the `changeset/2` function used to define a `Post` changeset used with the `Repo` module earlier in the `Posts` context when creating or updating data.
+Here's an example of a `Post` schema that defines a post with `title` and `body` fields. We also see the `changeset/2` function used to define a `Post` changeset used with the `Repo` module earlier in the `Posts` context when creating or updating data.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -170,9 +164,9 @@ defmodule Blog.Posts.Post do
   import Ecto.Changeset
 
   schema "posts" do
-    field :content, :string
-    field :subtitle, :string
     field :title, :string
+    field :subtitle, :string
+    field :content, :string
 
     timestamps()
   end
@@ -190,7 +184,7 @@ The [Ecto.schema/2](https://hexdocs.pm/ecto/Ecto.Schema.html#schema/2) and [fiel
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Validations And Constraints
+#### Validations And Constraints
 
 Validations ensure data is valid before entering the database. Constraints are rules enforced by the database.
 
@@ -209,7 +203,7 @@ def changeset(post, attrs) do
   end
 ```
 
-## Migration
+### Migration
 
 Migrations are used to make changes to a database schema over time, as the requirements of an application evolve. Here's an example of a `CreatePosts` migration that would create a `posts` table in the database.
 
@@ -220,16 +214,19 @@ defmodule Blog.Repo.Migrations.CreatePosts do
   use Ecto.Migration
 
   def change do
-    create table(:posts) do
+    create table(:posts, primary_key: false) do
+      add :id, :binary_id, primary_key: true
       add :title, :string
       add :subtitle, :string
       add :content, :text
 
       timestamps()
     end
+
     create unique_index(:posts, [:title])
   end
 end
+
 ```
 
 The [Ecto.Migration](https://hexdocs.pm/ecto_sql/Ecto.Migration.html) module provides functions for manipulating tables and fields in a table. The [create/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#create/2) macro creates a new table in the database and the [add/3](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#add/3) adds a new column to the table.
@@ -240,7 +237,7 @@ Some database field types which are not Elixir primitive types such as `:text` c
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Generating Migrations
+#### Generating Migrations
 
 Migrations should always be generated rather than manually created to add a timestamp to the migration file. For example, the example above might be in a file `priv/repo/migrations/20230508221034_create_posts.ex`
 
@@ -256,7 +253,7 @@ $ mix ecto.gen.migration create_posts
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Running Migrations
+#### Running Migrations
 
 Migrations are run in chronological order based on the timestamp, so they can be run or reset anytime using the following commands:
 
@@ -278,53 +275,11 @@ $ mix ecto.rollback
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Manipulating Tables
-
-Ecto provides functions for manipulating tables in a database. Here are a few common functions:
-
-- [create/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#create/2): creates a new table in the database
-- [alter/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#alter/2): modifies an existing table in the database
-- [rename/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#rename/2): renames an existing table in the database
-- [drop/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#drop/2): removes an existing table from the database
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Manipulating Fields
-
-[Ecto.Migration](https://hexdocs.pm/ecto_sql/Ecto.Migration.html) provides functions for manipulating fields in a table. Here are a few to get you started.
-
-- [add/3](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#add/3) adds a new field to the table.
-- [modify/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#modify/3) modifies an existing field in the table.
-- [remove/2](https://hexdocs.pm/ecto/Ecto.Migration.html#remove/1) removes an existing field from the table.
-
-Here is an example migration that uses some of these Ecto functions to manipulate fields on a table:
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-defmodule MyApp.Repo.Migrations.AlterUsersTable do
-  use Ecto.Migration
-
-  def change do
-    alter table(:users) do
-      add :phone, :string
-
-      modify :email, :string, unique: true
-      modify :name, :string, null: false
-
-      remove :age
-    end
-  end
-end
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Schemas Reflect Migrations
+#### Schemas Reflect Migrations
 
 The schema maps the fields of our database table into Elixir data. A migration may involve changing the data type or structure of an existing column, which would in turn require updating the schema to reflect these changes. Always ensure the schema reflects the latest version of a table in the database.
 
-## Query
+### Query
 
 The [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html) module defines functions for creating database queries. Queries themselves do not manipulate data in the database, but are instead a set of instructions to perform some operation in the database typically provided the [Ecto.Repo](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2) that performs the actual work on the Database.
 
@@ -367,7 +322,7 @@ query =
   |> order_by([p], desc: p.published_on)
 ```
 
-## Repo
+### Repo
 
 The [Ecto.Repo](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2) module defines functions for working with the database. Anytime we need to manipulate records in the database we work with the `Repo` module.
 
@@ -391,39 +346,7 @@ For example, here's an example of how we use a `Post` struct to create a changes
 |> Repo.insert()
 ```
 
-## Entity Relationship Diagrams
-
-Projects often use Entity Relationship Diagrams or UML (Unified Modelling Language) diagrams of some kind to represent the data layer of the application.
-
-Livebook let's us write Entity Relationship Diagrams directly. See [Mermaid: Entity Relationship Diagrams](https://mermaid.js.org/syntax/entityRelationshipDiagram.html) for an overview of the syntax.
-
-It's important to be able to read these diagrams. Here's an example:
-
-```mermaid
-erDiagram
-
-Comment {
-  id post_id
-  text content
-}
-
-Post {
-  string title
-  text content
-  date published_on
-  boolean visibility
-}
-
-Post ||--O{ Comment : "has many"
-```
-
-The above diagram describes both the fields and types of the data, as well as the associations between data.
-
-The pipe `||` in the line between `Post` and `Comment` represents **one** and the triple-lined-arrow with a circle represents **zero or more**. This describes the **one to many** relationship between posts and comments.
-
-The `post_id` field isn't strictly necessary given the diagram arrow implies the child contains a foreign key id but we've included it for sake of clarity.
-
-## Seeding
+### Seeding
 
 Phoenix projects include a `priv/repo/seeds.exs` file for creating data (seeding) the database.
 
@@ -470,39 +393,4 @@ Consider the following resource(s) to deepen your understanding of the topic.
 
 ## Commit Your Progress
 
-DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
-
-Run `git status` to ensure there are no undesirable changes.
-Then run the following in your command line from the `curriculum` folder to commit your progress.
-
-```
-$ git add .
-$ git commit -m "finish Phoenix And Ecto reading"
-$ git push
-```
-
-We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
-
-We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
-We will accept applications for the June-August 2023 cohort soon.
-
 ## Navigation
-
-<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
-<div style="display: flex;">
-<i class="ri-home-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
-</div>
-<div style="display: flex;">
-<i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Phoenix And Ecto">Report An Issue</a>
-</div>
-<div style="display: flex;">
-<i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/group_project_blog.livemd">Group Project: Blog</a>
-</div>
-<div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_posts.livemd">Blog: Posts</a>
-<i class="ri-arrow-right-fill"></i>
-</div>
-</div>
