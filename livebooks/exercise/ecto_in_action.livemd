@@ -5,7 +5,9 @@ Mix.install([
   {:jason, "~> 1.4"},
   {:kino, "~> 0.9", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:httpoison, "~> 2.2"},
+  {:jason, "~> 1.4"}
 ])
 ```
 
@@ -35,26 +37,28 @@ Requirements breakdown:
       - should be unique
     - `type` - enum that defines origin of Pokemon (nature, fire etc)
       - try use `Ecto.Enum` for that
-      - you can find possible values with `curl --location 'https://pokeapi.co/api/v2/type/?limit=0&offset=0' | jq '.results[].name'` (assumes `jq` installed on your computer)
+      - you can find possible values here:
+
+```elixir
+with  {:ok, %{status_code: 200, body: body}} <- HTTPoison.get("https://pokeapi.co/api/v2/type/?limit=0&offset=0"),
+  {:ok, json_response} <- Jason.decode(body) do
+
+  json_response
+  |> Map.get("results")
+  |> Enum.map(& &1["name"])
+end
+```
+
 - ensure DB receives above schema
   - write migration, you can use `mix ecto.gen.migration migration_name` to create a scaffold
   - migrate DB with `mix ecto.migrate`
 - write functions in context module `Pokemon.Pokedex` for creating, and deleting Pokemon
-- write tests schema and contexts
+- write tests `Pokemon.Pokedex` and `Pokemon.Pokedex.Pokemon`
 - prepare seeds for 20 pokemons in `apps/pokemon/priv/repo/seeds.exs`
   - you can use Faker for generating stuff
   - check out documentation of `Ecto.Enum` for accessing values
 - wire previous function `Pokemon.Pokedex.random_pack/1` with DB storage
 - expose all new pokemon fields in `/api/pokemons/random` endpoint
-
-## Further Reading
-
-Consider the following resource(s) to deepen your understanding of the topic.
-
-- [Phoenix Generators: mix phx.gen](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.html#content)
-- [Phoenix HTML Generator: mix phx.gen.html](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.html#content)
-- [Phoenix Schema Generator Types](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Schema.html#module-attributes)
-- [Pragmatic Bookshelf: Programming Ecto](https://pragprog.com/titles/wmecto/programming-ecto/)
 
 ## Commit Your Progress
 
