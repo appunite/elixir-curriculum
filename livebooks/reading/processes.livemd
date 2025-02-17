@@ -48,7 +48,7 @@ Upon completing this lesson, a student should be able to answer the following qu
 
 For an introduction to processes, how they work under the hood, and why that matters, we recommend the exceptional talk by Sasa Juric: "The Soul of Erlang."
 
-<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=JvBT4XBdoUE\")","title":"The Soul of Erlang and Elixir • Sasa Juric • GOTO 2019"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":"eyJzb3VyY2UiOiJZb3VUdWJlLm5ldyhcImh0dHBzOi8vd3d3LnlvdXR1YmUuY29tL3dhdGNoP3Y9SnZCVDRYQmRvVUVcIikiLCJ0aXRsZSI6IlRoZSBTb3VsIG9mIEVybGFuZyBhbmQgRWxpeGlyIOKAoiBTYXNhIEp1cmljIOKAoiBHT1RPIDIwMTkifQ","chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=JvBT4XBdoUE")

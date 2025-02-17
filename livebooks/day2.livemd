@@ -7,11 +7,11 @@ Today our schedule is to dig into Elixir project tooling, Phoenix, and Ecto. Mor
 
 ### This course assumptions
 
-- Target group - people who have previous programming experience in different languages. We won't cover fundamentals like what is **API** or **DB** or how to use them. But if you'd like us to cover something additional let us know.
-- Practical exercises with explanation of most important theoretical foundations.
-- Aims to consolidate basic Elixir knowledge from Day 1.
-- You will work with **git** repo to commit your progress. That will allow you to come back to the course later, revise knowledge and learn further things based on existing exercises.
-- Interrupt us as much as you need, don't be afraid to ask even stupid questions, and don't give up, remember:
+* Target group - people who have previous programming experience in different languages. We won't cover fundamentals like what is **API** or **DB** or how to use them. But if you'd like us to cover something additional let us know.
+* Practical exercises with explanation of most important theoretical foundations.
+* Aims to consolidate basic Elixir knowledge from Day 1.
+* You will work with **git** repo to commit your progress. That will allow you to come back to the course later, revise knowledge and learn further things based on existing exercises.
+* Interrupt us as much as you need, don't be afraid to ask even stupid questions, and don't give up, remember:
 
 > The master has failed more times than the beginner has even tried.
 
@@ -19,21 +19,21 @@ We will start with [Environment setup](./presentation/environment_setup.livemd).
 
 ### Agenda
 
-- [Setting up Mix project](./presentation/mix_introduction.livemd)
-- [Mix deeper dive](./presentation/mix_deeper_dive.livemd)
-- [Phoenix overview](./presentation/phoenix_overview.livemd)
-- [Phoenix app setup](./exercise/phoenix_app_setup.livemd)
-- [Ecto introduction](./presentation/ecto_introduction.livemd)
-- [Ecto in action](./exercise/ecto_in_action.livemd)
+* [Setting up Mix project](./presentation/mix_introduction.livemd)
+* [Mix deeper dive](./presentation/mix_deeper_dive.livemd)
+* [Phoenix overview](./presentation/phoenix_overview.livemd)
+* [Phoenix app setup](./exercise/phoenix_app_setup.livemd)
+* [Ecto introduction](./presentation/ecto_introduction.livemd)
+* [Ecto in action](./exercise/ecto_in_action.livemd)
 
 ### Extras
 
 We might cover the following topics if there is enough time or some of you would like to discuss later
 
-- [Advanced HTTP API](./presentation/phoenix_http_api.livemd)
-- [Integrating third-party HTTP API with Tesla](./presentation/integrating_third_party_http_api_with_tesla.livemd)
-- Simple UI with LiveView and generators
-- Oban introduction and async work
-- Reactive UI with LV and PubSub
-- Advanced domain models - implementing a reservation system
-- Metaprogramming with Elixir (macro, AST)
+* [Advanced HTTP API](./presentation/phoenix_http_api.livemd)
+* [Integrating third-party HTTP API with Tesla](./presentation/integrating_third_party_http_api_with_tesla.livemd)
+* Simple UI with LiveView and generators
+* Oban introduction and async work
+* Reactive UI with LV and PubSub
+* Advanced domain models - implementing a reservation system
+* Metaprogramming with Elixir (macro, AST)

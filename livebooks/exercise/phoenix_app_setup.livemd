@@ -13,13 +13,13 @@ Mix.install([
 
 ## Review Questions
 
-- How does router, controller and Plug interact to fulfill the job?
-- How to add additional endpoint to web app?
-- How to expose list of JSONs in controller?
-- How to add resource creation to the controller?
-- How Plug can be leveraged to implement basic authentication?
-- Can I implement pagination?
-- Can I plan whole flow of typical CRUD scenario? (router + controller + context + DB)
+* How does router, controller and Plug interact to fulfill the job?
+* How to add additional endpoint to web app?
+* How to expose list of JSONs in controller?
+* How to add resource creation to the controller?
+* How Plug can be leveraged to implement basic authentication?
+* Can I implement pagination?
+* Can I plan whole flow of typical CRUD scenario? (router + controller + context + DB)
 
 ## Bootstrap Phoenix
 
@@ -38,6 +38,7 @@ mix phx.new pokemon  --umbrella --binary-id --database postgres
 and tap `y` when prompted. You should have:
 
 <!-- livebook:{"break_markdown":true} -->
+
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
@@ -195,17 +196,17 @@ More reading about Phoenix Contexts available [here](https://hexdocs.pm/phoenix/
 
 Enough talking, let's do some stuff! Remember the `Pokedex.random_pack/1` function? Our job now is expose it via API in Phoenix. Requirements break down:
 
-- add context `Pokemon.Pokedex`
-- add `Pokemon.Pokedex.random_pack/1` function
-  - it returns 5 random pokemons
-  - it accepts 1 argument called `size`, which has default value of `5`
-  - list contains `%Pokemon.Pokedex.Pokemon{name: "name"}` structs
-  - you can generate pokemon name as you want
-  - no duplicates
-- expose endpoint `/api/pokemons/random`
-  - it accepts query param `size`, like `/api/pokemons/random?size=10`, which is optional
-  - `size` can't be greater than 20 or negative
-  - it renders response as follows:
+* add context `Pokemon.Pokedex`
+* add `Pokemon.Pokedex.random_pack/1` function
+  * it returns 5 random pokemons
+  * it accepts 1 argument called `size`, which has default value of `5`
+  * list contains `%Pokemon.Pokedex.Pokemon{name: "name"}` structs
+  * you can generate pokemon name as you want
+  * no duplicates
+* expose endpoint `/api/pokemons/random`
+  * it accepts query param `size`, like `/api/pokemons/random?size=10`, which is optional
+  * `size` can't be greater than 20 or negative
+  * it renders response as follows:
 
 ```json
 "data": [

@@ -15,10 +15,10 @@ Mix.install([
 
 Upon completing this lesson, a student should be able to answer the following questions.
 
-- What is mix umbrella application and how to create it?
-- How does mix manage umbrella dependencies?
-- How to configure apps?
-- How to cover simple module with unit-tests?
+* What is mix umbrella application and how to create it?
+* How does mix manage umbrella dependencies?
+* How to configure apps?
+* How to cover simple module with unit-tests?
 
 ## Umbrella apps
 
@@ -54,6 +54,7 @@ mix new pokemon_umbrella --umbrella
 ```
 
 <!-- livebook:{"break_markdown":true} -->
+
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
@@ -188,10 +189,10 @@ It's your turn, make it happen in your `pokemon_umbrella` project.
 Now we are going to implement its first feature, returning a random pack of pokemons.
 Specification outline for `Pokedex.random_pack/1`:
 
-- it returns list of structs `%Pokedex.Pokemon{name: "name"}`
-- it accepts 1 argument called `size`, which has default value of `5`
-- it returns unique pokemons (no duplicates)
-- it uses `PokemonProfile.Name.random/0` to generate names
+* it returns list of structs `%Pokedex.Pokemon{name: "name"}`
+* it accepts 1 argument called `size`, which has default value of `5`
+* it returns unique pokemons (no duplicates)
+* it uses `PokemonProfile.Name.random/0` to generate names
 
 You can start as follows:
 
@@ -251,11 +252,11 @@ flowchart LR
 
 Umbrella apps can be used for the following use cases:
 
-- Multiple teams working on modular monolith application.
-- Logical modularization for bigger apps
-- Separating frontend from backend
-- Flexible deployments scenarios
-- Phoenix app: web + domain
+* Multiple teams working on modular monolith application.
+* Logical modularization for bigger apps
+* Separating frontend from backend
+* Flexible deployments scenarios
+* Phoenix app: web + domain
 
 In the repository that implements precard service v2, we also employed umbrella project pattern. It looks like this:
 
@@ -407,18 +408,18 @@ Now the challenge for you:
 1. Write another implementation of `PokemonProfile.Greeter` -> `PokemonProfile.Greeter.Pirate`, that greets pokemons with "Ahoy pokemon_name !!!"
 2. Pick "adapter" on the fly, based on module 3 operation on the number of letters in pokemon name as follows:
 
-- "Blastoise" -> 9 letters -> mod 3 -> 0 -> `PokemonProfile.Greeter.Default`
-- "Pikachu" -> 7 letters -> mod 3 -> 1 -> `PokemonProfile.Greeter.Formal`
-- "Sewaddle" -> 8 letters -> mod 3 -> 2 -> `PokemonProfile.Greeter.Pirate`
+* "Blastoise" -> 9 letters -> mod 3 -> 0 -> `PokemonProfile.Greeter.Default`
+* "Pikachu" -> 7 letters -> mod 3 -> 1 -> `PokemonProfile.Greeter.Formal`
+* "Sewaddle" -> 8 letters -> mod 3 -> 2 -> `PokemonProfile.Greeter.Pirate`
 
-3. (more difficult) - write unit tests for that
+1. (more difficult) - write unit tests for that
 
 ## Further Reading
 
 For more on [Mix](https://hexdocs.pm/mix/Mix.html), consider reading the following.
 
-- [elixir-lang: Intro to Mix](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html)
-- [HexDocs: Mix](https://hexdocs.pm/mix/Mix.html#content)
+* [elixir-lang: Intro to Mix](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html)
+* [HexDocs: Mix](https://hexdocs.pm/mix/Mix.html#content)
 
 ## Commit Your Progress
 
