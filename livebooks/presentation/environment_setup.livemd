@@ -74,7 +74,7 @@ You can download it here: https://code.visualstudio.com/download
 
 After installation, please add extensions:
 
-- [ElixirLS: Elixir support and debugger](https://marketplace.visualstudio.com/items?itemName=JakeBecker.elixir-ls)
+* [ElixirLS: Elixir support and debugger](https://marketplace.visualstudio.com/items?itemName=JakeBecker.elixir-ls)
 
 ### Prepare projects directory
 

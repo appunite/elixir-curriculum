@@ -13,13 +13,13 @@ Mix.install([
 
 ## Review Questions
 
-- How does router, controller and Plug interact to fulfill the job?
-- How to add additional endpoint to web app?
-- How to expose list of JSONs in controller?
-- How to add resource creation to the controller?
-- How Plug can be leveraged to implement basic authentication?
-- Can I implement pagination?
-- Can I plan whole flow of typical CRUD scenario? (router + controller + context + DB)
+* How does router, controller and Plug interact to fulfill the job?
+* How to add additional endpoint to web app?
+* How to expose list of JSONs in controller?
+* How to add resource creation to the controller?
+* How Plug can be leveraged to implement basic authentication?
+* Can I implement pagination?
+* Can I plan whole flow of typical CRUD scenario? (router + controller + context + DB)
 
 ## Overview
 
