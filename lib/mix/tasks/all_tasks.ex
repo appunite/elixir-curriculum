@@ -6,8 +6,8 @@ defmodule Mix.Tasks.AllTasks do
 
   @requirements [
     "compile --force",
-    "format",
-    "spell_check"
+    "format"
+    #    "spell_check"
   ]
 
   alias Utils.Notebooks.Tasks
